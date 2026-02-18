@@ -1,0 +1,46 @@
+name: deploy-configure
+description: "Discover target platform, generate Dockerfile, CI/CD pipeline, and deployment configuration"
+author: "BMad"
+
+# Critical variables from config
+config_source: "{project-root}/_bmad/bmm/config.yaml"
+output_folder: "{config_source}:output_folder"
+user_name: "{config_source}:user_name"
+communication_language: "{config_source}:communication_language"
+user_skill_level: "{config_source}:user_skill_level"
+document_output_language: "{config_source}:document_output_language"
+project_name: "{config_source}:project_name"
+date: system-generated
+
+# Workflow components
+installed_path: "{project-root}/_bmad/bmm/workflows/deploy/deploy-configure"
+steps_path: "{installed_path}/steps"
+
+# Provider registry — extensible design
+# When adding a new provider, create its step file and register here
+provider_registry:
+  aws-ecs:
+    name: "AWS ECS (Containers)"
+    mcp: "AWS MCP Server"
+    step_file: "{steps_path}/step-provider-aws-ecs.md"
+    status: "active"
+  aws-s3:
+    name: "AWS S3 + CloudFront (Static)"
+    mcp: "AWS MCP Server"
+    step_file: "{steps_path}/step-provider-aws-s3.md"
+    status: "planned"
+  vercel:
+    name: "Vercel"
+    mcp: "Vercel MCP Server"
+    step_file: "{steps_path}/step-provider-vercel.md"
+    status: "planned"
+  netlify:
+    name: "Netlify"
+    mcp: "Netlify MCP Server"
+    step_file: "{steps_path}/step-provider-netlify.md"
+    status: "planned"
+  custom:
+    name: "Custom Server (Docker + SSH)"
+    mcp: null
+    step_file: "{steps_path}/step-provider-custom.md"
+    status: "planned"

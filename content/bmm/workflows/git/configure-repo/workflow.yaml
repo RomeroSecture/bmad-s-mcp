@@ -1,0 +1,29 @@
+name: configure-repo
+description: "Create and configure a GitHub repository with branching strategy, protections, .gitignore, and README"
+author: "BMad"
+
+# Critical variables from config
+config_source: "{project-root}/_bmad/bmm/config.yaml"
+output_folder: "{config_source}:output_folder"
+user_name: "{config_source}:user_name"
+communication_language: "{config_source}:communication_language"
+user_skill_level: "{config_source}:user_skill_level"
+document_output_language: "{config_source}:document_output_language"
+project_name: "{config_source}:project_name"
+date: system-generated
+
+# Workflow components
+installed_path: "{project-root}/_bmad/bmm/workflows/git/configure-repo"
+steps_path: "{installed_path}/steps"
+
+# MCP dependency — this workflow REQUIRES GitHub MCP
+required_mcps:
+  - name: "GitHub MCP Server"
+    check: "Attempt to list repositories via MCP"
+    fallback: "Redirect user to Smithers (SM) for setup"
+
+# --- Secture Mode Awareness ---
+# Before executing, the Git agent MUST have completed Secture Adaptation.
+# - VERIFY: Repository exists and is properly configured. Report status only.
+# - REFINE: Repository exists but needs improvements. Propose and apply with confirmation.
+# - GENERATE: No repository. Create from scratch with full guided setup.

@@ -1,0 +1,22 @@
+services:
+  bmad-mcp:
+    image: ghcr.io/bmad-code-org/bmad-mcp:latest
+    container_name: bmad-mcp
+    restart: unless-stopped
+    pull_policy: always
+    environment:
+      - BMAD_TRANSPORT=http
+      - BMAD_HTTP_PORT=3000
+    networks:
+      - traefik-public
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.bmad-mcp.rule=Host(`bmad.romerolabs.dev`)
+      - traefik.http.routers.bmad-mcp.entrypoints=https
+      - traefik.http.routers.bmad-mcp.tls=true
+      - traefik.http.routers.bmad-mcp.tls.certresolver=letsencrypt
+      - traefik.http.services.bmad-mcp.loadbalancer.server.port=3000
+
+networks:
+  traefik-public:
+    external: true

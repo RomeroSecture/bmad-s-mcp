@@ -1,0 +1,35 @@
+# Import Project Workflow (IP)
+# Smithers — Setup & Onboarding Agent
+# Purpose: Integrate BMAD-S into an existing project that was not built with the framework.
+
+# This workflow prepares an existing codebase for BMAD-S management by:
+# 1. Injecting the BMAD-S folder structure
+# 2. Scanning the existing project to understand what's already built
+# 3. Extracting/mapping existing documentation into planning artifacts
+# 4. Generating a gap analysis and recommended next steps
+
+workflow:
+  id: import-project
+  name: "Import Existing Project into BMAD-S"
+  agent: Smithers (Setup)
+  trigger: IP
+  
+  steps:
+    - step: 0
+      name: "VRG Gate — Project Import Assessment"
+      file: "./steps/step-00-vrg-gate.md"
+    - step: 1
+      name: "Prepare Project Structure"
+      file: "./steps/step-01-inject-structure.md"
+    - step: 2
+      name: "Deep Project Scan"
+      file: "./steps/step-02-deep-scan.md"
+    - step: 3
+      name: "Map Existing Documentation"
+      file: "./steps/step-03-map-docs.md"
+    - step: 4
+      name: "Generate Import Report"
+      file: "./steps/step-04-import-report.md"
+    - step: 5
+      name: "Agent Activation Plan"
+      file: "./steps/step-05-activation-plan.md"

@@ -1,0 +1,19 @@
+name: setup-project
+description: "Full project onboarding — personalize config.yaml, verify bmad.mdc, configure MCPs, and validate environment"
+author: "BMad"
+
+# Critical variables from config
+config_source: "{project-root}/_bmad/bmm/config.yaml"
+communication_language: "{config_source}:communication_language"
+user_skill_level: "{config_source}:user_skill_level"
+document_output_language: "{config_source}:document_output_language"
+date: system-generated
+
+# Workflow components
+installed_path: "{project-root}/_bmad/bmm/workflows/setup/setup-project"
+steps_path: "{installed_path}/steps"
+
+# This workflow orchestrates three phases:
+# Phase 1: Personalize config.yaml (steps/step-01-config.md)
+# Phase 2: Verify project structure and bmad.mdc (steps/step-02-verify-structure.md)
+# Phase 3: Hand off to setup-mcps workflow if user needs MCPs (steps/step-03-mcps-handoff.md)

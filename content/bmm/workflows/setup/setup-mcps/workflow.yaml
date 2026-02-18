@@ -1,0 +1,53 @@
+name: setup-mcps
+description: "Detect which MCP servers are needed, guide installation, generate configuration, and verify connectivity"
+author: "BMad"
+
+# Critical variables from config
+config_source: "{project-root}/_bmad/bmm/config.yaml"
+output_folder: "{config_source}:output_folder"
+user_name: "{config_source}:user_name"
+communication_language: "{config_source}:communication_language"
+user_skill_level: "{config_source}:user_skill_level"
+document_output_language: "{config_source}:document_output_language"
+date: system-generated
+
+# Workflow components
+installed_path: "{project-root}/_bmad/bmm/workflows/setup/setup-mcps"
+steps_path: "{installed_path}/steps"
+
+# MCP Registry — defines known MCPs and their requirements
+# When adding a new provider, add its entry here and create its step file
+mcp_registry:
+  github:
+    name: "GitHub MCP Server"
+    agent_dependency: ["Milhouse (Git)"]
+    auth_type: "Personal Access Token"
+    doc_url: "https://github.com/github/github-mcp-server"
+    step_file: "{steps_path}/step-configure-github.md"
+  aws:
+    name: "AWS MCP Server"
+    agent_dependency: ["Wiggum (Deploy)"]
+    auth_type: "AWS IAM Credentials"
+    doc_url: "https://awslabs.github.io/mcp/"
+    step_file: "{steps_path}/step-configure-aws.md"
+  vercel:
+    name: "Vercel MCP Server"
+    agent_dependency: ["Wiggum (Deploy)"]
+    auth_type: "API Token"
+    doc_url: "https://vercel.com/docs/mcp"
+    step_file: "{steps_path}/step-configure-vercel.md"
+    status: "planned"
+  netlify:
+    name: "Netlify MCP Server"
+    agent_dependency: ["Wiggum (Deploy)"]
+    auth_type: "Personal Access Token"
+    doc_url: "https://docs.netlify.com/build/build-with-ai/netlify-mcp-server/"
+    step_file: "{steps_path}/step-configure-netlify.md"
+    status: "planned"
+
+# --- Secture Mode Awareness ---
+# Before executing this workflow, the Setup agent MUST have completed the Secture
+# Adaptation protocol (VERIFY / REFINE / GENERATE).
+# - VERIFY mode: Check that existing MCP configurations are valid and responding.
+# - REFINE mode: Some MCPs configured, guide setup of missing ones.
+# - GENERATE mode: No MCP configuration exists. Full guided setup from scratch.

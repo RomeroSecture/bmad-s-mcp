@@ -1,0 +1,26 @@
+name: project-dashboard
+description: "Generate a consolidated project status dashboard from execution logs, project state, and deployment info"
+author: "BMad"
+
+# Critical variables from config
+config_source: "{project-root}/_bmad/bmm/config.yaml"
+user_name: "{config_source}:user_name"
+communication_language: "{config_source}:communication_language"
+user_skill_level: "{config_source}:user_skill_level"
+project_name: "{config_source}:project_name"
+output_folder: "{config_source}:output_folder"
+planning_artifacts: "{config_source}:planning_artifacts"
+implementation_artifacts: "{config_source}:implementation_artifacts"
+project_knowledge: "{config_source}:project_knowledge"
+date: system-generated
+
+# Workflow components
+installed_path: "{project-root}/_bmad/bmm/workflows/observe/project-dashboard"
+steps_path: "{installed_path}/steps"
+
+# Data sources — the dashboard reads from these
+data_sources:
+  execution_log: "{output_folder}/execution-log.yaml"
+  sprint_status: "{implementation_artifacts}/sprint-status.yaml"
+  repository_setup: "{project_knowledge}/repository-setup.md"
+  deployment_setup: "{project_knowledge}/deployment-setup.md"
