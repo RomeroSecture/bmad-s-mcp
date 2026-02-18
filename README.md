@@ -1,77 +1,77 @@
 # BMAD MCP Server
 
-> The entire BMAD Method in your IDE, zero installation per project.
+> Todo el Método BMAD en tu IDE, sin instalación por proyecto.
 
-**bmad-mcp** is an [MCP (Model Context Protocol)](https://modelcontextprotocol.io/) server that gives any AI-powered IDE instant access to the full **BMAD Method** — 13 specialized agents, 38 workflows, templates, data references, and the workflow execution engine — without copying files into every project.
+**bmad-mcp** es un servidor [MCP (Model Context Protocol)](https://modelcontextprotocol.io/) que da a cualquier IDE con IA acceso instantáneo al **Método BMAD** completo — 13 agentes especializados, 38 workflows, templates, datos de referencia y el motor de ejecución de workflows — sin copiar archivos en cada proyecto.
 
 ---
 
-## Table of Contents
+## Tabla de Contenidos
 
-- [What is BMAD?](#what-is-bmad)
-- [What is an MCP Server?](#what-is-an-mcp-server)
-- [Why bmad-mcp?](#why-bmad-mcp)
-- [Quick Start](#quick-start)
-- [Platform Setup](#platform-setup)
+- [¿Qué es BMAD?](#qué-es-bmad)
+- [¿Qué es un servidor MCP?](#qué-es-un-servidor-mcp)
+- [¿Por qué bmad-mcp?](#por-qué-bmad-mcp)
+- [Inicio Rápido](#inicio-rápido)
+- [Configuración por Plataforma](#configuración-por-plataforma)
   - [Claude Code](#claude-code)
   - [Cursor](#cursor)
   - [Windsurf](#windsurf)
   - [VS Code (Copilot)](#vs-code-copilot)
-  - [Remote Server (HTTP)](#remote-server-http)
-- [Configuration](#configuration)
-- [Available Tools (15)](#available-tools-15)
-- [Available Resources (5)](#available-resources-5)
-- [Agents](#agents)
+  - [Servidor Remoto (HTTP)](#servidor-remoto-http)
+- [Configuración](#configuración)
+- [Tools Disponibles (15)](#tools-disponibles-15)
+- [Resources Disponibles (5)](#resources-disponibles-5)
+- [Agentes](#agentes)
 - [Workflows](#workflows)
-- [How It Works](#how-it-works)
-- [Usage Examples](#usage-examples)
+- [Cómo Funciona](#cómo-funciona)
+- [Ejemplos de Uso](#ejemplos-de-uso)
 - [Self-Hosting](#self-hosting)
-- [Development](#development)
-- [Architecture](#architecture)
+- [Desarrollo](#desarrollo)
+- [Arquitectura](#arquitectura)
 - [FAQ](#faq)
-- [License](#license)
+- [Licencia](#licencia)
 
 ---
 
-## What is BMAD?
+## ¿Qué es BMAD?
 
-**BMAD** (Breakthrough Method of Agile AI-driven Development) is a comprehensive framework for AI-assisted software development. It provides:
+**BMAD** (Breakthrough Method of Agile AI-driven Development) es un framework integral para desarrollo de software asistido por IA. Proporciona:
 
-- **13 specialized AI agents** — each with a unique persona, expertise, and set of workflows
-- **38 structured workflows** — covering the full software development lifecycle from brainstorming to deployment
-- **4 development phases** — Analysis, Planning, Solutioning, and Implementation
-- **Templates, checklists, and data references** — for consistent, high-quality output
-- **A workflow execution engine** — that guides the AI step-by-step through complex multi-step processes
+- **13 agentes de IA especializados** — cada uno con una personalidad única, experiencia y conjunto de workflows
+- **38 workflows estructurados** — que cubren todo el ciclo de vida del desarrollo de software, desde brainstorming hasta despliegue
+- **4 fases de desarrollo** — Análisis, Planificación, Diseño de Solución e Implementación
+- **Templates, checklists y datos de referencia** — para resultados consistentes y de alta calidad
+- **Un motor de ejecución de workflows** — que guía a la IA paso a paso en procesos complejos multi-step
 
-Think of it as a complete "operating system" for AI-driven development, where each agent is a specialist team member (Product Manager, Architect, Developer, QA, etc.) and each workflow is a proven process they follow.
-
----
-
-## What is an MCP Server?
-
-[Model Context Protocol (MCP)](https://modelcontextprotocol.io/) is an open standard created by Anthropic that lets AI assistants connect to external data sources and tools. An MCP server exposes:
-
-- **Tools** — Functions the AI can call (like `bmad_list_workflows` or `bmad_get_agent`)
-- **Resources** — Static data the AI can read (like the workflow catalog or method overview)
-
-When you add an MCP server to your IDE, the AI gains new capabilities. In this case, it gains access to the entire BMAD methodology.
+Piensa en ello como un "sistema operativo" completo para desarrollo guiado por IA, donde cada agente es un miembro especialista del equipo (Product Manager, Arquitecto, Developer, QA, etc.) y cada workflow es un proceso probado que siguen.
 
 ---
 
-## Why bmad-mcp?
+## ¿Qué es un servidor MCP?
 
-### Before: Per-project installation
+[Model Context Protocol (MCP)](https://modelcontextprotocol.io/) es un estándar abierto creado por Anthropic que permite a los asistentes de IA conectarse con fuentes de datos y herramientas externas. Un servidor MCP expone:
+
+- **Tools** — Funciones que la IA puede llamar (como `bmad_list_workflows` o `bmad_get_agent`)
+- **Resources** — Datos estáticos que la IA puede leer (como el catálogo de workflows o el overview del método)
+
+Cuando añades un servidor MCP a tu IDE, la IA obtiene nuevas capacidades. En este caso, obtiene acceso a toda la metodología BMAD.
+
+---
+
+## ¿Por qué bmad-mcp?
+
+### Antes: Instalación por proyecto
 
 ```bash
-# Had to do this for EVERY project
+# Había que hacer esto en CADA proyecto
 npx bmad-method install
-# Creates _bmad/ directory with 260+ files in your project
+# Crea el directorio _bmad/ con 260+ archivos en tu proyecto
 ```
 
-### After: One global config
+### Después: Una configuración global
 
 ```jsonc
-// Add once to your IDE settings — works everywhere
+// Añadir una vez a tu IDE — funciona en todos los proyectos
 {
   "mcpServers": {
     "bmad": {
@@ -82,25 +82,25 @@ npx bmad-method install
 }
 ```
 
-### Key advantages
+### Ventajas clave
 
-| | Per-project install | MCP Server |
+| | Instalación por proyecto | Servidor MCP |
 |---|---|---|
-| **Setup** | `npx install` per project | One-time global config |
-| **Files in your repo** | 260+ files in `_bmad/` | Zero |
-| **Updates** | Reinstall per project | Update once globally |
-| **Works across IDEs** | Claude Code only | Claude Code, Cursor, Windsurf, VS Code |
-| **Team sharing** | Each member installs | Share one remote server |
-| **Content access** | File reads (slow) | Indexed in memory (fast) |
-| **Search** | Manual file navigation | `bmad_search_content` across all files |
+| **Setup** | `npx install` por proyecto | Config global una sola vez |
+| **Archivos en tu repo** | 260+ archivos en `_bmad/` | Cero |
+| **Actualizaciones** | Reinstalar por proyecto | Actualizar una vez globalmente |
+| **Funciona en IDEs** | Solo Claude Code | Claude Code, Cursor, Windsurf, VS Code |
+| **Compartir en equipo** | Cada miembro instala | Compartir un servidor remoto |
+| **Acceso al contenido** | Lectura de archivos (lento) | Indexado en memoria (rápido) |
+| **Búsqueda** | Navegación manual de archivos | `bmad_search_content` en todo el contenido |
 
 ---
 
-## Quick Start
+## Inicio Rápido
 
-### Option 1: npx (recommended)
+### Opción 1: npx (recomendado)
 
-No installation needed. Just add to your IDE config:
+No necesita instalación. Solo añade a la configuración de tu IDE:
 
 ```json
 {
@@ -113,16 +113,16 @@ No installation needed. Just add to your IDE config:
 }
 ```
 
-### Option 2: Global install
+### Opción 2: Instalación global
 
 ```bash
 npm install -g bmad-mcp
 ```
 
-### Option 3: From source
+### Opción 3: Desde código fuente
 
 ```bash
-git clone https://github.com/bmad-code-org/bmad-mcp.git
+git clone https://github.com/RomeroSecture/bmad-s-mcp.git
 cd bmad-mcp
 npm install
 npm run build
@@ -130,11 +130,11 @@ npm run build
 
 ---
 
-## Platform Setup
+## Configuración por Plataforma
 
 ### Claude Code
 
-Add to `~/.claude/settings.json` (global) or `.claude/settings.json` (per-project):
+Añadir a `~/.claude/settings.json` (global) o `.claude/settings.json` (por proyecto):
 
 ```json
 {
@@ -143,8 +143,8 @@ Add to `~/.claude/settings.json` (global) or `.claude/settings.json` (per-projec
       "command": "npx",
       "args": ["-y", "bmad-mcp"],
       "env": {
-        "BMAD_USER_NAME": "YourName",
-        "BMAD_LANG": "English",
+        "BMAD_USER_NAME": "TuNombre",
+        "BMAD_LANG": "Spanish",
         "BMAD_SKILL_LEVEL": "expert"
       }
     }
@@ -152,11 +152,11 @@ Add to `~/.claude/settings.json` (global) or `.claude/settings.json` (per-projec
 }
 ```
 
-Restart Claude Code. The 15 BMAD tools will appear automatically.
+Reinicia Claude Code. Los 15 tools de BMAD aparecerán automáticamente.
 
 ### Cursor
 
-Add to `.cursor/mcp.json` in your project or global config:
+Añadir a `.cursor/mcp.json` en tu proyecto o configuración global:
 
 ```json
 {
@@ -165,8 +165,8 @@ Add to `.cursor/mcp.json` in your project or global config:
       "command": "npx",
       "args": ["-y", "bmad-mcp"],
       "env": {
-        "BMAD_USER_NAME": "YourName",
-        "BMAD_LANG": "English"
+        "BMAD_USER_NAME": "TuNombre",
+        "BMAD_LANG": "Spanish"
       }
     }
   }
@@ -175,7 +175,7 @@ Add to `.cursor/mcp.json` in your project or global config:
 
 ### Windsurf
 
-Add to Windsurf's MCP configuration:
+Añadir a la configuración MCP de Windsurf:
 
 ```json
 {
@@ -184,7 +184,7 @@ Add to Windsurf's MCP configuration:
       "command": "npx",
       "args": ["-y", "bmad-mcp"],
       "env": {
-        "BMAD_USER_NAME": "YourName"
+        "BMAD_USER_NAME": "TuNombre"
       }
     }
   }
@@ -193,7 +193,7 @@ Add to Windsurf's MCP configuration:
 
 ### VS Code (Copilot)
 
-Add to VS Code's `settings.json`:
+Añadir a `settings.json` de VS Code:
 
 ```json
 {
@@ -203,7 +203,7 @@ Add to VS Code's `settings.json`:
         "command": "npx",
         "args": ["-y", "bmad-mcp"],
         "env": {
-          "BMAD_USER_NAME": "YourName"
+          "BMAD_USER_NAME": "TuNombre"
         }
       }
     }
@@ -211,122 +211,122 @@ Add to VS Code's `settings.json`:
 }
 ```
 
-### Remote Server (HTTP)
+### Servidor Remoto (HTTP)
 
-For team-wide access, deploy once and connect from any IDE:
+Para acceso de todo el equipo, despliega una vez y conecta desde cualquier IDE:
 
 ```json
 {
   "mcpServers": {
     "bmad": {
-      "url": "https://your-server.example.com/mcp"
+      "url": "https://tu-servidor.ejemplo.com/mcp"
     }
   }
 }
 ```
 
-See [Self-Hosting](#self-hosting) for deployment instructions.
+Ver [Self-Hosting](#self-hosting) para instrucciones de despliegue.
 
 ---
 
-## Configuration
+## Configuración
 
-### Environment Variables
+### Variables de Entorno
 
-Customize BMAD behavior by setting environment variables in your MCP config:
+Personaliza el comportamiento de BMAD configurando variables de entorno en tu config MCP:
 
-| Variable | Default | Description |
+| Variable | Default | Descripción |
 |----------|---------|-------------|
-| `BMAD_USER_NAME` | `"BMad"` | How agents address you |
-| `BMAD_LANG` | `"English"` | Language for agent communication |
-| `BMAD_DOC_LANG` | `"English"` | Language for generated documents |
-| `BMAD_SKILL_LEVEL` | `"intermediate"` | `beginner` / `intermediate` / `expert` — adjusts verbosity |
-| `BMAD_PROJECT_NAME` | directory name | Your project name |
-| `BMAD_OUTPUT_FOLDER` | `"_bmad-output"` | Where workflows save output files |
-| `BMAD_TRANSPORT` | `"stdio"` | `stdio` (local) or `http` (remote) |
-| `BMAD_HTTP_PORT` | `3000` | Port for HTTP transport |
+| `BMAD_USER_NAME` | `"BMad"` | Cómo se dirigen los agentes a ti |
+| `BMAD_LANG` | `"English"` | Idioma para la comunicación de los agentes |
+| `BMAD_DOC_LANG` | `"English"` | Idioma para los documentos generados |
+| `BMAD_SKILL_LEVEL` | `"intermediate"` | `beginner` / `intermediate` / `expert` — ajusta la verbosidad |
+| `BMAD_PROJECT_NAME` | nombre del directorio | Nombre de tu proyecto |
+| `BMAD_OUTPUT_FOLDER` | `"_bmad-output"` | Dónde guardan los workflows los archivos de salida |
+| `BMAD_TRANSPORT` | `"stdio"` | `stdio` (local) o `http` (remoto) |
+| `BMAD_HTTP_PORT` | `3000` | Puerto para el transporte HTTP |
 
-### Configuration Priority
+### Prioridad de Configuración
 
-Settings are resolved in this order (first wins):
+Los ajustes se resuelven en este orden (el primero gana):
 
-1. **Environment variables** — set in your MCP config
-2. **Local project config** — `{project}/_bmad/bmm/config.yaml` (if it exists)
-3. **Defaults** — built-in sensible defaults
+1. **Variables de entorno** — configuradas en tu config MCP
+2. **Config local del proyecto** — `{proyecto}/_bmad/bmm/config.yaml` (si existe)
+3. **Defaults** — valores por defecto sensatos incluidos
 
-This means you can set global preferences via env vars and override per-project if needed.
-
----
-
-## Available Tools (15)
-
-### Discovery Tools
-
-| Tool | Description | Example Input |
-|------|-------------|---------------|
-| `bmad_list_agents` | List all agents with roles, icons, and workflow codes | `{ "module": "bmm" }` |
-| `bmad_list_workflows` | Browse the complete workflow catalog | `{ "phase": "2-planning" }` |
-| `bmad_list_templates` | List available document templates | `{ "module": "bmm" }` |
-| `bmad_list_data` | List data files, protocols, references | `{ "category": "all" }` |
-| `bmad_help` | Smart routing — recommends the next workflow | `{ "context": "PRD is done" }` |
-
-### Content Delivery Tools
-
-| Tool | Description | Example Input |
-|------|-------------|---------------|
-| `bmad_get_agent` | Load a complete agent definition (persona, role, menu) | `{ "agent_id": "architect" }` |
-| `bmad_get_workflow` | Load a workflow by code or path | `{ "workflow_code": "CP" }` |
-| `bmad_get_step` | Load a specific step from a workflow | `{ "workflow_path": "bmm/workflows/2-plan-workflows/create-prd", "step_file": "step-01-init.md" }` |
-| `bmad_get_template` | Load a document template with placeholders | `{ "template_path": "bmm/workflows/2-plan-workflows/create-prd/templates/prd-template.md" }` |
-| `bmad_get_data` | Load a data/reference file | `{ "data_path": "bmm/data/project-context-template.md" }` |
-| `bmad_get_task` | Load a task engine (workflow.xml, help.md) | `{ "task_name": "workflow" }` |
-| `bmad_get_protocol` | Load a protocol definition | `{ "protocol_name": "ELP" }` |
-| `bmad_get_config` | View the resolved configuration | `{}` |
-
-### Advanced Tools
-
-| Tool | Description | Example Input |
-|------|-------------|---------------|
-| `bmad_get_checklist` | Get validation checklist for a workflow | `{ "workflow_path": "bmm/workflows/4-implementation/code-review/workflow.yaml" }` |
-| `bmad_search_content` | Full-text search across all BMAD content | `{ "query": "sprint planning", "file_types": ["md", "yaml"] }` |
+Esto significa que puedes establecer preferencias globales vía env vars y sobreescribirlas por proyecto si lo necesitas.
 
 ---
 
-## Available Resources (5)
+## Tools Disponibles (15)
 
-MCP resources are static data that the AI can read on demand:
+### Tools de Descubrimiento
 
-| Resource URI | Description |
+| Tool | Descripción | Ejemplo de Input |
+|------|-------------|-----------------|
+| `bmad_list_agents` | Listar todos los agentes con roles, iconos y códigos de workflow | `{ "module": "bmm" }` |
+| `bmad_list_workflows` | Explorar el catálogo completo de workflows | `{ "phase": "2-planning" }` |
+| `bmad_list_templates` | Listar templates de documentos disponibles | `{ "module": "bmm" }` |
+| `bmad_list_data` | Listar archivos de datos, protocolos y referencias | `{ "category": "all" }` |
+| `bmad_help` | Enrutamiento inteligente — recomienda el siguiente workflow | `{ "context": "PRD is done" }` |
+
+### Tools de Entrega de Contenido
+
+| Tool | Descripción | Ejemplo de Input |
+|------|-------------|-----------------|
+| `bmad_get_agent` | Cargar la definición completa de un agente (persona, rol, menú) | `{ "agent_id": "architect" }` |
+| `bmad_get_workflow` | Cargar un workflow por código o ruta | `{ "workflow_code": "CP" }` |
+| `bmad_get_step` | Cargar un paso específico de un workflow | `{ "workflow_path": "bmm/workflows/2-plan-workflows/create-prd", "step_file": "step-01-init.md" }` |
+| `bmad_get_template` | Cargar un template con placeholders | `{ "template_path": "bmm/workflows/2-plan-workflows/create-prd/templates/prd-template.md" }` |
+| `bmad_get_data` | Cargar un archivo de datos/referencia | `{ "data_path": "bmm/data/project-context-template.md" }` |
+| `bmad_get_task` | Cargar un motor de tareas (workflow.xml, help.md) | `{ "task_name": "workflow" }` |
+| `bmad_get_protocol` | Cargar la definición de un protocolo | `{ "protocol_name": "ELP" }` |
+| `bmad_get_config` | Ver la configuración resuelta | `{}` |
+
+### Tools Avanzados
+
+| Tool | Descripción | Ejemplo de Input |
+|------|-------------|-----------------|
+| `bmad_get_checklist` | Obtener checklist de validación de un workflow | `{ "workflow_path": "bmm/workflows/4-implementation/code-review/workflow.yaml" }` |
+| `bmad_search_content` | Búsqueda full-text en todo el contenido BMAD | `{ "query": "sprint planning", "file_types": ["md", "yaml"] }` |
+
+---
+
+## Resources Disponibles (5)
+
+Los resources MCP son datos estáticos que la IA puede leer bajo demanda:
+
+| URI del Resource | Descripción |
 |---|---|
-| `bmad://config` | Current resolved configuration (YAML) |
-| `bmad://catalog/workflows` | Complete workflow catalog with metadata (JSON) |
-| `bmad://catalog/agents` | Full agent roster with roles and capabilities (JSON) |
-| `bmad://docs/overview` | Compiled overview of the BMAD Method (Markdown) |
-| `bmad://core/workflow-engine` | The `workflow.xml` engine for executing YAML workflows (XML) |
+| `bmad://config` | Configuración actual resuelta (YAML) |
+| `bmad://catalog/workflows` | Catálogo completo de workflows con metadata (JSON) |
+| `bmad://catalog/agents` | Roster completo de agentes con roles y capacidades (JSON) |
+| `bmad://docs/overview` | Overview compilado del Método BMAD (Markdown) |
+| `bmad://core/workflow-engine` | El motor `workflow.xml` para ejecutar workflows YAML (XML) |
 
 ---
 
-## Agents
+## Agentes
 
-BMAD includes 13 specialized agents, each with a unique personality, expertise, and set of workflows:
+BMAD incluye 13 agentes especializados, cada uno con una personalidad única, experiencia y conjunto de workflows:
 
-| Icon | Name | Role | Key Workflows |
-|------|------|------|---------------|
-| 📊 | **Monty** | Business Analyst | Brainstorm, Research, Create Brief |
-| 📋 | **Lisa** | Product Manager | Create/Validate/Edit PRD, Epics & Stories |
-| 🎨 | **Marge** | UX Designer | Create UX Design |
-| 🏗️ | **Frink** | Architect | Create Architecture, Implementation Readiness |
-| 🏃 | **Ned** | Scrum Master | Sprint Planning, Create Story, Retrospective |
+| Icono | Nombre | Rol | Workflows Principales |
+|-------|--------|-----|----------------------|
+| 📊 | **Monty** | Analista de Negocio | Brainstorm, Investigación, Crear Brief |
+| 📋 | **Lisa** | Product Manager | Crear/Validar/Editar PRD, Epics & Stories |
+| 🎨 | **Marge** | Diseñadora UX | Crear Diseño UX |
+| 🏗️ | **Frink** | Arquitecto | Crear Arquitectura, Preparación para Implementación |
+| 🏃 | **Ned** | Scrum Master | Sprint Planning, Crear Story, Retrospectiva |
 | 💻 | **Homer** | Developer | Dev Story, Code Review |
-| 🧪 | **Edna** | QA Engineer | QA Automation Tests |
+| 🧪 | **Edna** | QA Engineer | Tests de Automatización QA |
 | 🚀 | **Bart** | Quick Flow Solo Dev | Quick Spec, Quick Dev |
-| 📚 | **Kent** | Technical Writer | Write Document, Mermaid Diagrams, Explain Concepts |
-| 🗂️ | **Milhouse** | Git & Repository | Configure Repo, Manage PRs |
-| 🚀 | **Wiggum** | Deploy & CI/CD | Deploy Configure, Deploy Execute |
-| 🔧 | **Smithers** | Setup & Onboarding | Setup Project, Setup MCPs |
-| 🧙 | **BMad Master** | Master Orchestrator | Cross-agent coordination, Knowledge Custodian |
+| 📚 | **Kent** | Technical Writer | Escribir Documento, Diagramas Mermaid, Explicar Conceptos |
+| 🗂️ | **Milhouse** | Git & Repositorio | Configurar Repo, Gestionar PRs |
+| 🚀 | **Wiggum** | Deploy & CI/CD | Configurar Deploy, Ejecutar Deploy |
+| 🔧 | **Smithers** | Setup & Onboarding | Setup Proyecto, Setup MCPs |
+| 🧙 | **BMad Master** | Orquestador Maestro | Coordinación cross-agente, Custodio del Conocimiento |
 
-To load an agent, use:
+Para cargar un agente, usa:
 ```
 bmad_get_agent({ "agent_id": "architect" })
 ```
@@ -335,188 +335,188 @@ bmad_get_agent({ "agent_id": "architect" })
 
 ## Workflows
 
-### Lifecycle Phases
+### Fases del Ciclo de Vida
 
-BMAD organizes development into 4 sequential phases plus anytime utilities:
+BMAD organiza el desarrollo en 4 fases secuenciales más utilidades disponibles en cualquier momento:
 
 ```
-  Anytime Tools (available at any phase)
+  Herramientas Anytime (disponibles en cualquier fase)
          │
     ┌────┴────┐
     ▼         ▼
-┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│  1. Analysis    │────▶│  2. Planning     │────▶│  3. Solutioning │────▶│  4. Implementation│
-│                 │     │                  │     │                 │     │                   │
-│  Brainstorm     │     │  Create PRD ★    │     │  Architecture ★ │     │  Sprint Plan ★    │
-│  Market Research│     │  Validate PRD    │     │  Epics/Stories ★│     │  Create Story ★   │
-│  Domain Research│     │  Edit PRD        │     │  Readiness ★    │     │  Dev Story ★      │
-│  Tech Research  │     │  Create UX       │     │                 │     │  Code Review      │
-│  Create Brief   │     │                  │     │                 │     │  QA Tests         │
-│                 │     │                  │     │                 │     │  Retrospective    │
-└─────────────────┘     └─────────────────┘     └─────────────────┘     └─────────────────┘
-                                                                          ★ = required
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────────┐
+│  1. Análisis    │────▶│  2. Planificación│────▶│  3. Solución    │────▶│  4. Implementación  │
+│                 │     │                  │     │                 │     │                     │
+│  Brainstorm     │     │  Crear PRD ★     │     │  Arquitectura ★ │     │  Sprint Plan ★      │
+│  Invest. Mercado│     │  Validar PRD     │     │  Epics/Stories ★│     │  Crear Story ★      │
+│  Invest. Dominio│     │  Editar PRD      │     │  Preparación ★  │     │  Dev Story ★        │
+│  Invest. Técnica│     │  Crear UX        │     │                 │     │  Code Review        │
+│  Crear Brief    │     │                  │     │                 │     │  QA Tests           │
+│                 │     │                  │     │                 │     │  Retrospectiva      │
+└─────────────────┘     └─────────────────┘     └─────────────────┘     └─────────────────────┘
+                                                                          ★ = requerido
 ```
 
-### Anytime Tools
+### Herramientas Anytime
 
-These work at any phase and don't require phase progression:
+Funcionan en cualquier fase y no requieren progresión de fases:
 
-| Code | Workflow | Agent | Description |
-|------|----------|-------|-------------|
-| QS | Quick Spec | Bart | Fast spec for simple tasks without full BMAD planning |
-| QD | Quick Dev | Bart | Quick implementation for one-off tasks |
-| DP | Document Project | Monty | Analyze existing project to produce documentation |
-| GPC | Generate Project Context | Monty | Scan codebase for an LLM-optimized project context file |
-| CC | Correct Course | Ned | Navigate significant changes mid-project |
-| WD | Write Document | Kent | Create documentation following best practices |
-| MG | Mermaid Generate | Kent | Create Mermaid diagrams |
-| VD | Validate Document | Kent | Review documents against standards |
-| EC | Explain Concept | Kent | Create technical explanations with examples |
-| PM | Party Mode | - | Multi-agent discussion orchestration |
-| BH | bmad-help | - | Smart routing to the next recommended workflow |
+| Código | Workflow | Agente | Descripción |
+|--------|----------|--------|-------------|
+| QS | Quick Spec | Bart | Spec rápida para tareas simples sin planificación BMAD completa |
+| QD | Quick Dev | Bart | Implementación rápida para tareas puntuales |
+| DP | Document Project | Monty | Analizar proyecto existente para producir documentación |
+| GPC | Generate Project Context | Monty | Escanear codebase para archivo de contexto optimizado para LLM |
+| CC | Correct Course | Ned | Navegar cambios significativos a mitad de proyecto |
+| WD | Write Document | Kent | Crear documentación siguiendo mejores prácticas |
+| MG | Mermaid Generate | Kent | Crear diagramas Mermaid |
+| VD | Validate Document | Kent | Revisar documentos contra estándares |
+| EC | Explain Concept | Kent | Crear explicaciones técnicas con ejemplos |
+| PM | Party Mode | - | Orquestación de discusión multi-agente |
+| BH | bmad-help | - | Enrutamiento inteligente al siguiente workflow recomendado |
 
-### Phase 1: Analysis
+### Fase 1: Análisis
 
-| Code | Workflow | Description |
-|------|----------|-------------|
-| BP | Brainstorm Project | Guided facilitation through brainstorming techniques |
-| MR | Market Research | Market analysis, competitive landscape, customer needs |
-| DR | Domain Research | Industry deep dive, subject matter expertise |
-| TR | Technical Research | Technical feasibility, architecture options |
-| CB | Create Brief | Guided experience to nail down your product idea |
+| Código | Workflow | Descripción |
+|--------|----------|-------------|
+| BP | Brainstorm Project | Facilitación guiada a través de técnicas de brainstorming |
+| MR | Market Research | Análisis de mercado, panorama competitivo, necesidades del cliente |
+| DR | Domain Research | Inmersión profunda en la industria, conocimiento especializado |
+| TR | Technical Research | Viabilidad técnica, opciones de arquitectura |
+| CB | Create Brief | Experiencia guiada para definir tu idea de producto |
 
-### Phase 2: Planning
+### Fase 2: Planificación
 
-| Code | Workflow | Required | Description |
-|------|----------|----------|-------------|
-| CP | Create PRD | **Yes** | Expert-led facilitation for Product Requirements Document |
-| VP | Validate PRD | No | Validate PRD is comprehensive and cohesive |
-| EP | Edit PRD | No | Improve and enhance an existing PRD |
-| CU | Create UX | No | Guided UX design workflow |
+| Código | Workflow | Requerido | Descripción |
+|--------|----------|-----------|-------------|
+| CP | Create PRD | **Sí** | Facilitación experta para el Documento de Requisitos de Producto |
+| VP | Validate PRD | No | Validar que el PRD sea completo y coherente |
+| EP | Edit PRD | No | Mejorar y perfeccionar un PRD existente |
+| CU | Create UX | No | Workflow guiado de diseño UX |
 
-### Phase 3: Solutioning
+### Fase 3: Diseño de Solución
 
-| Code | Workflow | Required | Description |
-|------|----------|----------|-------------|
-| CA | Create Architecture | **Yes** | Guided workflow to document technical decisions |
-| CE | Create Epics & Stories | **Yes** | Create the full epics and stories listing |
-| IR | Check Implementation Readiness | **Yes** | Ensure PRD, UX, Architecture, and Stories are aligned |
+| Código | Workflow | Requerido | Descripción |
+|--------|----------|-----------|-------------|
+| CA | Create Architecture | **Sí** | Workflow guiado para documentar decisiones técnicas |
+| CE | Create Epics & Stories | **Sí** | Crear el listado completo de epics y stories |
+| IR | Check Implementation Readiness | **Sí** | Asegurar que PRD, UX, Arquitectura y Stories están alineados |
 
-### Phase 4: Implementation
+### Fase 4: Implementación
 
-| Code | Workflow | Required | Description |
-|------|----------|----------|-------------|
-| SP | Sprint Planning | **Yes** | Generate sprint plan to kick off implementation |
-| CS | Create Story | **Yes** | Prepare the next story for development |
-| DS | Dev Story | **Yes** | Execute story implementation and tests |
-| CR | Code Review | No | Review code, route back to DS or next story |
-| QA | QA Automation Test | No | Generate automated tests for implemented code |
-| SS | Sprint Status | No | Summarize sprint progress and route next |
-| ER | Retrospective | No | Review completed work and lessons learned |
+| Código | Workflow | Requerido | Descripción |
+|--------|----------|-----------|-------------|
+| SP | Sprint Planning | **Sí** | Generar plan de sprint para iniciar la implementación |
+| CS | Create Story | **Sí** | Preparar la siguiente story para desarrollo |
+| DS | Dev Story | **Sí** | Ejecutar implementación de story y tests |
+| CR | Code Review | No | Revisar código, volver a DS o siguiente story |
+| QA | QA Automation Test | No | Generar tests automatizados para código implementado |
+| SS | Sprint Status | No | Resumir progreso del sprint y enrutar siguiente |
+| ER | Retrospective | No | Revisar trabajo completado y lecciones aprendidas |
 
 ---
 
-## How It Works
+## Cómo Funciona
 
-### Architecture
+### Arquitectura
 
 ```
-Your IDE (Claude Code / Cursor / Windsurf / VS Code)
+Tu IDE (Claude Code / Cursor / Windsurf / VS Code)
      │
-     │  MCP Protocol
+     │  Protocolo MCP
      ▼
 ┌─────────────────────────────────────┐
 │  bmad-mcp server                    │
 │                                     │
-│  ContentRegistry (262 files indexed)│
-│  ├── core/    (tasks, workflows)    │
-│  ├── bmm/     (agents, workflows)   │
+│  ContentRegistry (262 archivos)     │
+│  ├── core/    (tareas, workflows)   │
+│  ├── bmm/     (agentes, workflows)  │
 │  └── utility/ (templates)           │
 │                                     │
 │  15 Tools + 5 Resources             │
 └─────────────────────────────────────┘
 ```
 
-### The Flow
+### El Flujo
 
-1. **You ask the AI** something like "I want to create a PRD for my project"
-2. **The AI calls** `bmad_list_workflows` or `bmad_help` to find the right workflow
-3. **The AI calls** `bmad_get_agent({ "agent_id": "pm" })` to load Lisa, the Product Manager
-4. **The AI calls** `bmad_get_workflow({ "workflow_code": "CP" })` to load the Create PRD workflow
-5. **The AI follows** the workflow steps, calling `bmad_get_step` for each step
-6. **The AI uses** templates via `bmad_get_template` to structure the output
-7. **You get** a professional PRD created through expert-guided facilitation
+1. **Le pides a la IA** algo como "Quiero crear un PRD para mi proyecto"
+2. **La IA llama** a `bmad_list_workflows` o `bmad_help` para encontrar el workflow correcto
+3. **La IA llama** a `bmad_get_agent({ "agent_id": "pm" })` para cargar a Lisa, la Product Manager
+4. **La IA llama** a `bmad_get_workflow({ "workflow_code": "CP" })` para cargar el workflow Create PRD
+5. **La IA sigue** los pasos del workflow, llamando a `bmad_get_step` para cada paso
+6. **La IA usa** templates vía `bmad_get_template` para estructurar la salida
+7. **Obtienes** un PRD profesional creado a través de facilitación guiada por expertos
 
-The MCP server is a **content server** — it serves the methodology content. The AI in your IDE is the **execution engine** — it reads the content and follows the instructions, just as it would with local files.
+El servidor MCP es un **servidor de contenido** — sirve el contenido de la metodología. La IA en tu IDE es el **motor de ejecución** — lee el contenido y sigue las instrucciones, igual que lo haría con archivos locales.
 
-### Key Design Decisions
+### Decisiones de Diseño Clave
 
-- **Content is bundled** — All 262 BMAD files (2.1 MB) are included in the server. No network calls to fetch content at runtime.
-- **Indexed at startup** — Every file is categorized and indexed into an in-memory registry for sub-millisecond lookups.
-- **Stateless** — The server has no session state. The AI manages conversational context; BMAD manages document state via output files.
-- **Granular tools** — 15 small, focused tools instead of few large ones. LLMs work better with specific tool schemas.
+- **Contenido empaquetado** — Los 262 archivos BMAD (2.1 MB) están incluidos en el servidor. Sin llamadas de red para obtener contenido en tiempo de ejecución.
+- **Indexado al arrancar** — Cada archivo se categoriza e indexa en un registro en memoria para búsquedas en sub-milisegundos.
+- **Sin estado** — El servidor no tiene estado de sesión. La IA gestiona el contexto conversacional; BMAD gestiona el estado de documentos vía archivos de salida.
+- **Tools granulares** — 15 tools pequeños y enfocados en vez de pocos grandes. Los LLMs funcionan mejor con schemas de tools específicos.
 
 ---
 
-## Usage Examples
+## Ejemplos de Uso
 
-### Starting a new project from scratch
-
-```
-You: "I want to build a task management app. Help me use BMAD to plan it."
-
-AI calls: bmad_help({ "context": "new project, no artifacts yet" })
-AI calls: bmad_get_agent({ "agent_id": "analyst" })
-AI calls: bmad_get_workflow({ "workflow_code": "BP" })
-→ Starts guided brainstorming session as Monty the Analyst
-```
-
-### Creating a PRD
+### Iniciar un proyecto nuevo desde cero
 
 ```
-You: "Let's create the PRD"
+Tú: "Quiero construir una app de gestión de tareas. Ayúdame a planificarlo con BMAD."
 
-AI calls: bmad_get_agent({ "agent_id": "pm" })
-AI calls: bmad_get_workflow({ "workflow_code": "CP" })
-AI calls: bmad_get_step({ "workflow_path": "bmm/workflows/2-plan-workflows/create-prd", "step_file": "step-01-init.md", "steps_dir": "steps-c" })
-→ Lisa guides you through 12 steps to create a comprehensive PRD
+La IA llama: bmad_help({ "context": "proyecto nuevo, sin artefactos aún" })
+La IA llama: bmad_get_agent({ "agent_id": "analyst" })
+La IA llama: bmad_get_workflow({ "workflow_code": "BP" })
+→ Inicia sesión de brainstorming guiada como Monty el Analista
 ```
 
-### Quick one-off task
+### Crear un PRD
 
 ```
-You: "I just need to add a login page, nothing fancy"
+Tú: "Vamos a crear el PRD"
 
-AI calls: bmad_get_agent({ "agent_id": "quick-flow-solo-dev" })
-AI calls: bmad_get_workflow({ "workflow_code": "QD" })
-→ Bart does a quick implementation without full BMAD planning
+La IA llama: bmad_get_agent({ "agent_id": "pm" })
+La IA llama: bmad_get_workflow({ "workflow_code": "CP" })
+La IA llama: bmad_get_step({ "workflow_path": "bmm/workflows/2-plan-workflows/create-prd", "step_file": "step-01-init.md", "steps_dir": "steps-c" })
+→ Lisa te guía a través de 12 pasos para crear un PRD completo
 ```
 
-### Finding what to do next
+### Tarea rápida puntual
 
 ```
-You: "What should I do after architecture is done?"
+Tú: "Solo necesito añadir una página de login, nada sofisticado"
 
-AI calls: bmad_help({ "context": "architecture completed" })
-→ Recommends: Create Epics & Stories [CE] (required), then Implementation Readiness [IR]
+La IA llama: bmad_get_agent({ "agent_id": "quick-flow-solo-dev" })
+La IA llama: bmad_get_workflow({ "workflow_code": "QD" })
+→ Bart hace una implementación rápida sin planificación BMAD completa
 ```
 
-### Searching for content
+### Saber qué hacer a continuación
 
 ```
-You: "Find me everything about sprint planning"
+Tú: "¿Qué debo hacer después de terminar la arquitectura?"
 
-AI calls: bmad_search_content({ "query": "sprint planning", "file_types": ["md", "yaml"] })
-→ Returns matching files with line-level context
+La IA llama: bmad_help({ "context": "arquitectura completada" })
+→ Recomienda: Create Epics & Stories [CE] (requerido), luego Implementation Readiness [IR]
+```
+
+### Buscar contenido
+
+```
+Tú: "Encuentra todo lo relacionado con sprint planning"
+
+La IA llama: bmad_search_content({ "query": "sprint planning", "file_types": ["md", "yaml"] })
+→ Devuelve archivos coincidentes con contexto a nivel de línea
 ```
 
 ---
 
 ## Self-Hosting
 
-### Docker (for team/remote access)
+### Docker (para acceso de equipo/remoto)
 
-Build and run with Docker:
+Construir y ejecutar con Docker:
 
 ```bash
 docker build -t bmad-mcp .
@@ -527,7 +527,7 @@ docker run -d \
   bmad-mcp
 ```
 
-### Docker Compose with Traefik
+### Docker Compose con Traefik
 
 ```yaml
 # docker-compose.prod.yml
@@ -543,7 +543,7 @@ services:
       - traefik-public
     labels:
       - traefik.enable=true
-      - traefik.http.routers.bmad-mcp.rule=Host(`bmad.yourdomain.com`)
+      - traefik.http.routers.bmad-mcp.rule=Host(`bmad.tudominio.com`)
       - traefik.http.routers.bmad-mcp.entrypoints=https
       - traefik.http.routers.bmad-mcp.tls=true
       - traefik.http.routers.bmad-mcp.tls.certresolver=letsencrypt
@@ -561,19 +561,19 @@ docker compose -f docker-compose.prod.yml up -d
 ### Health Check
 
 ```bash
-curl https://bmad.yourdomain.com/health
+curl https://bmad.tudominio.com/health
 # {"status":"ok","server":"bmad-mcp"}
 ```
 
-### Team Configuration
+### Configuración de Equipo
 
-Once deployed, every team member adds one line to their IDE:
+Una vez desplegado, cada miembro del equipo añade una línea a su IDE:
 
 ```json
 {
   "mcpServers": {
     "bmad": {
-      "url": "https://bmad.yourdomain.com/mcp"
+      "url": "https://bmad.tudominio.com/mcp"
     }
   }
 }
@@ -581,9 +581,9 @@ Once deployed, every team member adds one line to their IDE:
 
 ---
 
-## Development
+## Desarrollo
 
-### Prerequisites
+### Prerrequisitos
 
 - Node.js 20+
 - npm
@@ -591,136 +591,136 @@ Once deployed, every team member adds one line to their IDE:
 ### Setup
 
 ```bash
-git clone https://github.com/bmad-code-org/bmad-mcp.git
+git clone https://github.com/RomeroSecture/bmad-s-mcp.git
 cd bmad-mcp
 npm install
-npm run sync-content   # Copy BMAD content from parent repo
+npm run sync-content   # Copiar contenido BMAD del repo padre
 npm run build
 ```
 
-### Commands
+### Comandos
 
 ```bash
-npm run build          # Compile TypeScript → dist/
-npm run dev            # Run with hot reload (tsx)
-npm start              # Run compiled server
-npm run sync-content   # Re-sync content from BMAD-S repo
-npm test               # Run tests
-npm run test:watch     # Run tests in watch mode
+npm run build          # Compilar TypeScript → dist/
+npm run dev            # Ejecutar con hot reload (tsx)
+npm start              # Ejecutar servidor compilado
+npm run sync-content   # Re-sincronizar contenido del repo BMAD-S
+npm test               # Ejecutar tests
+npm run test:watch     # Ejecutar tests en modo watch
 ```
 
-### Testing locally
+### Probar localmente
 
 ```bash
-# Test stdio transport
+# Probar transporte stdio
 echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-03-26","capabilities":{},"clientInfo":{"name":"test","version":"1.0.0"}}}' | node dist/index.js
 
-# Test HTTP transport
+# Probar transporte HTTP
 BMAD_TRANSPORT=http node dist/index.js
 curl http://localhost:3000/health
 ```
 
 ---
 
-## Architecture
+## Arquitectura
 
-### Project Structure
+### Estructura del Proyecto
 
 ```
 bmad-mcp/
 ├── src/
-│   ├── index.ts                 # Entry point — selects stdio or http transport
-│   ├── server.ts                # Creates McpServer, registers tools + resources
+│   ├── index.ts                 # Entry point — selecciona transporte stdio o http
+│   ├── server.ts                # Crea McpServer, registra tools + resources
 │   ├── transport/
-│   │   ├── stdio.ts             # Local stdio transport (default)
-│   │   └── http.ts              # Remote HTTP transport (Express + StreamableHTTP)
+│   │   ├── stdio.ts             # Transporte stdio local (por defecto)
+│   │   └── http.ts              # Transporte HTTP remoto (Express + StreamableHTTP)
 │   ├── config/
-│   │   ├── schema.ts            # Zod validation schemas
-│   │   ├── loader.ts            # Config resolution (env → local → defaults)
-│   │   └── variables.ts         # BMAD variable engine ({project-root}, {{date}}, etc.)
+│   │   ├── schema.ts            # Schemas de validación Zod
+│   │   ├── loader.ts            # Resolución de config (env → local → defaults)
+│   │   └── variables.ts         # Motor de variables BMAD ({project-root}, {{date}}, etc.)
 │   ├── content/
-│   │   ├── registry.ts          # In-memory file index (built at startup)
-│   │   └── reader.ts            # File reader with path resolution
-│   ├── tools/                   # 15 MCP tool implementations
-│   │   └── index.ts             # Registration orchestrator
-│   ├── resources/               # 5 MCP resource definitions
+│   │   ├── registry.ts          # Índice de archivos en memoria (construido al arrancar)
+│   │   └── reader.ts            # Lector de archivos con resolución de rutas
+│   ├── tools/                   # 15 implementaciones de tools MCP
+│   │   └── index.ts             # Orquestador de registro
+│   ├── resources/               # 5 definiciones de resources MCP
 │   │   └── index.ts
 │   └── utils/
-│       ├── csv-parser.ts        # module-help.csv parser
-│       ├── yaml-parser.ts       # Agent YAML parser
-│       └── path-resolver.ts     # Content path translation
-├── content/                     # Bundled BMAD content (262 files, ~2.1 MB)
-│   ├── core/                    # Core tasks, workflows, and the master agent
-│   ├── bmm/                     # Main module: agents, workflows, protocols
-│   └── utility/                 # Shared agent components and templates
+│       ├── csv-parser.ts        # Parser de module-help.csv
+│       ├── yaml-parser.ts       # Parser de YAML de agentes
+│       └── path-resolver.ts     # Traducción de rutas de contenido
+├── content/                     # Contenido BMAD empaquetado (262 archivos, ~2.1 MB)
+│   ├── core/                    # Tareas core, workflows y el agente maestro
+│   ├── bmm/                     # Módulo principal: agentes, workflows, protocolos
+│   └── utility/                 # Componentes de agente compartidos y templates
 ├── scripts/
-│   └── sync-content.ts          # Syncs _bmad/ from BMAD-S repo
-├── Dockerfile                   # Multi-stage build for production
-├── docker-compose.prod.yml      # Traefik-ready deployment config
-└── test/                        # Vitest test suites
+│   └── sync-content.ts          # Sincroniza _bmad/ desde el repo BMAD-S
+├── Dockerfile                   # Build multi-stage para producción
+├── docker-compose.prod.yml      # Config de despliegue lista para Traefik
+└── test/                        # Suites de tests Vitest
 ```
 
-### Tech Stack
+### Stack Tecnológico
 
-| Component | Technology |
+| Componente | Tecnología |
 |-----------|-----------|
 | Runtime | Node.js 20+ |
-| Language | TypeScript 5.8 |
+| Lenguaje | TypeScript 5.8 |
 | MCP SDK | `@modelcontextprotocol/sdk` 1.12+ |
-| Validation | Zod 3.25+ |
-| YAML parsing | js-yaml 4.1 |
-| CSV parsing | csv-parse 6.1 |
-| HTTP server | Express 5.1 |
+| Validación | Zod 3.25+ |
+| Parsing YAML | js-yaml 4.1 |
+| Parsing CSV | csv-parse 6.1 |
+| Servidor HTTP | Express 5.1 |
 | Tests | Vitest 3.2 |
 
 ---
 
 ## FAQ
 
-### Do I still need to install BMAD per project?
+### ¿Todavía necesito instalar BMAD por proyecto?
 
-**No.** That's the whole point. The MCP server bundles all BMAD content and serves it on demand. No `_bmad/` directory needed in your projects.
+**No.** Ese es precisamente el objetivo. El servidor MCP empaqueta todo el contenido BMAD y lo sirve bajo demanda. No necesitas el directorio `_bmad/` en tus proyectos.
 
-### Does it work offline?
+### ¿Funciona offline?
 
-**Yes**, when using stdio transport (the default). All content is bundled in the server — no internet required.
+**Sí**, cuando usas el transporte stdio (el default). Todo el contenido está empaquetado en el servidor — no se requiere internet.
 
-### Can I use it with a project that already has `_bmad/` installed?
+### ¿Puedo usarlo con un proyecto que ya tiene `_bmad/` instalado?
 
-**Yes.** If a local `_bmad/bmm/config.yaml` exists, the server reads it for project-specific settings (like output paths). The MCP tools take priority for content delivery.
+**Sí.** Si existe un `_bmad/bmm/config.yaml` local, el servidor lo lee para configuraciones específicas del proyecto (como rutas de salida). Los tools MCP tienen prioridad para la entrega de contenido.
 
-### What's the difference between stdio and HTTP transport?
+### ¿Cuál es la diferencia entre transporte stdio y HTTP?
 
-- **stdio** (default) — The IDE launches the server as a subprocess. Fast, works offline, no network setup.
-- **HTTP** — The server runs as a web service. Useful for team sharing or remote access from multiple machines.
+- **stdio** (default) — El IDE lanza el servidor como subproceso. Rápido, funciona offline, sin configuración de red.
+- **HTTP** — El servidor corre como servicio web. Útil para compartir con el equipo o acceso remoto desde múltiples máquinas.
 
-### How do I update the BMAD content?
+### ¿Cómo actualizo el contenido BMAD?
 
-If running from source:
+Si ejecutas desde código fuente:
 ```bash
-npm run sync-content   # Pull latest from BMAD-S repo
-npm run build          # Rebuild
+npm run sync-content   # Obtener lo último del repo BMAD-S
+npm run build          # Recompilar
 ```
 
-If using npx, the content updates when a new version is published.
+Si usas npx, el contenido se actualiza cuando se publica una nueva versión.
 
-### Can I customize agent behavior?
+### ¿Puedo personalizar el comportamiento de los agentes?
 
-Yes, via environment variables:
-- `BMAD_SKILL_LEVEL` adjusts verbosity (beginner gets more explanation, expert gets concise output)
-- `BMAD_LANG` sets the communication language
-- `BMAD_DOC_LANG` sets the document output language
+Sí, mediante variables de entorno:
+- `BMAD_SKILL_LEVEL` ajusta la verbosidad (beginner recibe más explicación, expert recibe salida concisa)
+- `BMAD_LANG` establece el idioma de comunicación
+- `BMAD_DOC_LANG` establece el idioma de los documentos de salida
 
-### How do I know which workflow to use?
+### ¿Cómo sé qué workflow usar?
 
-Call `bmad_help` — it analyzes your project state and recommends the next workflow based on phase progression and completed artifacts.
+Llama a `bmad_help` — analiza el estado de tu proyecto y recomienda el siguiente workflow basado en la progresión de fases y artefactos completados.
 
-### Can my whole team use one server?
+### ¿Puede todo mi equipo usar un solo servidor?
 
-**Yes.** Deploy via Docker with HTTP transport, and every team member connects with a one-line URL config. The server is stateless, so it handles concurrent users naturally.
+**Sí.** Despliega vía Docker con transporte HTTP, y cada miembro del equipo se conecta con una configuración de URL de una línea. El servidor no tiene estado, así que maneja usuarios concurrentes de forma natural.
 
 ---
 
-## License
+## Licencia
 
 MIT
