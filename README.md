@@ -1,14 +1,16 @@
-# BMAD MCP Server
+# BMAD-S MCP Server
 
-> Todo el Método BMAD en tu IDE, sin instalación por proyecto.
+> Todo el Método BMAD-S en tu IDE, sin instalación por proyecto.
 
-**bmad-mcp** es un servidor [MCP (Model Context Protocol)](https://modelcontextprotocol.io/) que da a cualquier IDE con IA acceso instantáneo al **Método BMAD** completo — 13 agentes especializados, 38 workflows, templates, datos de referencia y el motor de ejecución de workflows — sin copiar archivos en cada proyecto.
+**bmad-mcp** es un servidor [MCP (Model Context Protocol)](https://modelcontextprotocol.io/) que da a cualquier IDE con IA acceso instantáneo al **Método BMAD-S** completo — 13 agentes especializados, 38 workflows, documentación de la metodología, templates, datos de referencia y el motor de ejecución de workflows — sin copiar archivos en cada proyecto.
+
+**BMAD-S** es la edición de [Secture](https://secture.com) de **BMAD** (Breakthrough Method of Agile AI-driven Development), adaptada a las necesidades y flujos de trabajo de la empresa.
 
 ---
 
 ## Tabla de Contenidos
 
-- [¿Qué es BMAD?](#qué-es-bmad)
+- [¿Qué es BMAD-S?](#qué-es-bmad-s)
 - [¿Qué es un servidor MCP?](#qué-es-un-servidor-mcp)
 - [¿Por qué bmad-mcp?](#por-qué-bmad-mcp)
 - [Inicio Rápido](#inicio-rápido)
@@ -19,10 +21,11 @@
   - [VS Code (Copilot)](#vs-code-copilot)
   - [Servidor Remoto (HTTP)](#servidor-remoto-http)
 - [Configuración](#configuración)
-- [Tools Disponibles (15)](#tools-disponibles-15)
+- [Tools Disponibles (17)](#tools-disponibles-17)
 - [Resources Disponibles (5)](#resources-disponibles-5)
 - [Agentes](#agentes)
 - [Workflows](#workflows)
+- [Documentación de la Metodología](#documentación-de-la-metodología)
 - [Cómo Funciona](#cómo-funciona)
 - [Migración: De Archivos Locales a MCP](#migración-de-archivos-locales-a-mcp)
 - [Ejemplos de Uso](#ejemplos-de-uso)
@@ -34,15 +37,18 @@
 
 ---
 
-## ¿Qué es BMAD?
+## ¿Qué es BMAD-S?
 
-**BMAD** (Breakthrough Method of Agile AI-driven Development) es un framework integral para desarrollo de software asistido por IA. Proporciona:
+**BMAD-S** es la edición **Secture** de **BMAD** (Breakthrough Method of Agile AI-driven Development) — un framework integral para desarrollo de software asistido por IA. [Secture](https://secture.com) mantiene y adapta esta edición para las necesidades de su equipo y proyectos.
+
+BMAD-S proporciona:
 
 - **13 agentes de IA especializados** — cada uno con una personalidad única, experiencia y conjunto de workflows
 - **38 workflows estructurados** — que cubren todo el ciclo de vida del desarrollo de software, desde brainstorming hasta despliegue
 - **4 fases de desarrollo** — Análisis, Planificación, Diseño de Solución e Implementación
 - **Templates, checklists y datos de referencia** — para resultados consistentes y de alta calidad
 - **Un motor de ejecución de workflows** — que guía a la IA paso a paso en procesos complejos multi-step
+- **Documentación completa de la metodología** — tutoriales, guías how-to, explicaciones conceptuales y referencia técnica
 
 Piensa en ello como un "sistema operativo" completo para desarrollo guiado por IA, donde cada agente es un miembro especialista del equipo (Product Manager, Arquitecto, Developer, QA, etc.) y cada workflow es un proceso probado que siguen.
 
@@ -55,7 +61,7 @@ Piensa en ello como un "sistema operativo" completo para desarrollo guiado por I
 - **Tools** — Funciones que la IA puede llamar (como `bmad_list_workflows` o `bmad_get_agent`)
 - **Resources** — Datos estáticos que la IA puede leer (como el catálogo de workflows o el overview del método)
 
-Cuando añades un servidor MCP a tu IDE, la IA obtiene nuevas capacidades. En este caso, obtiene acceso a toda la metodología BMAD.
+Cuando añades un servidor MCP a tu IDE, la IA obtiene nuevas capacidades. En este caso, obtiene acceso a toda la metodología BMAD-S.
 
 ---
 
@@ -153,7 +159,7 @@ Añadir a `~/.claude/settings.json` (global) o `.claude/settings.json` (por proy
 }
 ```
 
-Reinicia Claude Code. Los 15 tools de BMAD aparecerán automáticamente.
+Reinicia Claude Code. Los 17 tools de BMAD-S aparecerán automáticamente.
 
 ### Cursor
 
@@ -259,7 +265,7 @@ Esto significa que puedes establecer preferencias globales vía env vars y sobre
 
 ---
 
-## Tools Disponibles (15)
+## Tools Disponibles (17)
 
 ### Tools de Descubrimiento
 
@@ -289,7 +295,16 @@ Esto significa que puedes establecer preferencias globales vía env vars y sobre
 | Tool | Descripción | Ejemplo de Input |
 |------|-------------|-----------------|
 | `bmad_get_checklist` | Obtener checklist de validación de un workflow | `{ "workflow_path": "bmm/workflows/4-implementation/code-review/workflow.yaml" }` |
-| `bmad_search_content` | Búsqueda full-text en todo el contenido BMAD | `{ "query": "sprint planning", "file_types": ["md", "yaml"] }` |
+| `bmad_search_content` | Búsqueda full-text en todo el contenido BMAD-S | `{ "query": "sprint planning", "file_types": ["md", "yaml"] }` |
+
+### Tools de Documentación
+
+| Tool | Descripción | Ejemplo de Input |
+|------|-------------|-----------------|
+| `bmad_list_docs` | Listar documentación de la metodología por categoría | `{ "category": "how-to" }` |
+| `bmad_get_doc` | Obtener un documento por ruta o tema | `{ "topic": "brainstorming" }` |
+
+Las categorías disponibles son: `tutorials`, `how-to`, `explanation`, `reference`, `bmgd` (BMAD Game Development), y `all`.
 
 ---
 
@@ -302,14 +317,14 @@ Los resources MCP son datos estáticos que la IA puede leer bajo demanda:
 | `bmad://config` | Configuración actual resuelta (YAML) |
 | `bmad://catalog/workflows` | Catálogo completo de workflows con metadata (JSON) |
 | `bmad://catalog/agents` | Roster completo de agentes con roles y capacidades (JSON) |
-| `bmad://docs/overview` | Overview compilado del Método BMAD (Markdown) |
+| `bmad://docs/overview` | Overview del Método BMAD-S con documentación real (Markdown) |
 | `bmad://core/workflow-engine` | El motor `workflow.xml` para ejecutar workflows YAML (XML) |
 
 ---
 
 ## Agentes
 
-BMAD incluye 13 agentes especializados, cada uno con una personalidad única, experiencia y conjunto de workflows:
+BMAD-S incluye 13 agentes especializados, cada uno con una personalidad única, experiencia y conjunto de workflows:
 
 | Icono | Nombre | Rol | Workflows Principales |
 |-------|--------|-----|----------------------|
@@ -417,6 +432,36 @@ Funcionan en cualquier fase y no requieren progresión de fases:
 
 ---
 
+## Documentación de la Metodología
+
+BMAD-S incluye documentación completa de la metodología, accesible directamente desde el MCP:
+
+| Categoría | Contenido | Ejemplo |
+|-----------|-----------|---------|
+| **tutorials** | Guías paso a paso para empezar | Getting Started |
+| **how-to** | Guías prácticas para tareas específicas | Cómo personalizar BMAD, Quick Fixes, Shard Large Documents |
+| **explanation** | Explicaciones conceptuales en profundidad | Brainstorming, Party Mode, Quick Flow, Why Solutioning Matters |
+| **reference** | Referencia técnica | Mapa de workflows, Agentes, Módulos, Comandos |
+| **bmgd** | BMAD Game Development | Tipos de juegos, Quick Flow para juegos |
+
+### Acceder a la documentación
+
+```
+Tú: "¿Cómo funciona el brainstorming en BMAD?"
+
+La IA llama: bmad_get_doc({ "topic": "brainstorming" })
+→ Recibe la guía completa sobre la funcionalidad de brainstorming
+```
+
+```
+Tú: "¿Qué documentación hay disponible?"
+
+La IA llama: bmad_list_docs({ "category": "all" })
+→ Lista de 30+ documentos organizados por categoría
+```
+
+---
+
 ## Cómo Funciona
 
 ### Arquitectura
@@ -429,12 +474,13 @@ Tu IDE (Claude Code / Cursor / Windsurf / VS Code)
 ┌─────────────────────────────────────┐
 │  bmad-mcp server                    │
 │                                     │
-│  ContentRegistry (262 archivos)     │
+│  ContentRegistry (296 archivos)     │
 │  ├── core/    (tareas, workflows)   │
 │  ├── bmm/     (agentes, workflows)  │
-│  └── utility/ (templates)           │
+│  ├── utility/ (templates)           │
+│  └── docs/    (metodología)         │
 │                                     │
-│  15 Tools + 5 Resources             │
+│  17 Tools + 5 Resources             │
 └─────────────────────────────────────┘
 ```
 
@@ -452,10 +498,10 @@ El servidor MCP es un **servidor de contenido** — sirve el contenido de la met
 
 ### Decisiones de Diseño Clave
 
-- **Contenido empaquetado** — Los 262 archivos BMAD (2.1 MB) están incluidos en el servidor. Sin llamadas de red para obtener contenido en tiempo de ejecución.
+- **Contenido empaquetado** — Los 296 archivos BMAD-S (contenido + documentación) están incluidos en el servidor. Sin llamadas de red para obtener contenido en tiempo de ejecución.
 - **Indexado al arrancar** — Cada archivo se categoriza e indexa en un registro en memoria para búsquedas en sub-milisegundos.
 - **Sin estado** — El servidor no tiene estado de sesión. La IA gestiona el contexto conversacional; BMAD gestiona el estado de documentos vía archivos de salida.
-- **Tools granulares** — 15 tools pequeños y enfocados en vez de pocos grandes. Los LLMs funcionan mejor con schemas de tools específicos.
+- **Tools granulares** — 17 tools pequeños y enfocados en vez de pocos grandes. Los LLMs funcionan mejor con schemas de tools específicos.
 
 ---
 
@@ -580,6 +626,15 @@ La IA llama: bmad_help({ "context": "arquitectura completada" })
 → Recomienda: Create Epics & Stories [CE] (requerido), luego Implementation Readiness [IR]
 ```
 
+### Consultar la documentación de la metodología
+
+```
+Tú: "Explícame cómo funciona el party mode en BMAD"
+
+La IA llama: bmad_get_doc({ "topic": "party mode" })
+→ Recibe la documentación completa sobre Party Mode
+```
+
 ### Buscar contenido
 
 ```
@@ -687,9 +742,9 @@ npm test               # Ejecutar tests
 npm run test:watch     # Ejecutar tests en modo watch
 ```
 
-### Actualizar contenido BMAD
+### Actualizar contenido BMAD-S
 
-El contenido raw vive en `_bmad/` (committed al repo). Para actualizar:
+El contenido raw vive en `_bmad/` (workflows, agentes) y `_docs/` (documentación de la metodología), ambos committed al repo. Para actualizar:
 
 ```bash
 # Opción 1: Copiar desde el repo padre BMAD-S
@@ -736,7 +791,7 @@ bmad-mcp/
 │   ├── content/
 │   │   ├── registry.ts          # Índice de archivos en memoria (construido al arrancar)
 │   │   └── reader.ts            # Lector de archivos con resolución de rutas
-│   ├── tools/                   # 15 implementaciones de tools MCP
+│   ├── tools/                   # 17 implementaciones de tools MCP
 │   │   └── index.ts             # Orquestador de registro
 │   ├── resources/               # 5 definiciones de resources MCP
 │   │   └── index.ts
@@ -745,14 +800,21 @@ bmad-mcp/
 │       ├── csv-parser.ts        # Parser de module-help.csv
 │       ├── yaml-parser.ts       # Parser de YAML de agentes
 │       └── path-resolver.ts     # Traducción de rutas de contenido
-├── _bmad/                       # Contenido BMAD raw (fuente, committed)
+├── _bmad/                       # Contenido BMAD-S raw (fuente, committed)
 │   ├── core/                    # Tareas core, workflows y el agente maestro
 │   ├── bmm/                     # Módulo principal: agentes, workflows, protocolos
 │   └── utility/                 # Componentes de agente compartidos y templates
+├── _docs/                       # Documentación de la metodología (committed)
+│   ├── tutorials/               # Guías paso a paso
+│   ├── how-to/                  # Guías prácticas
+│   ├── explanation/             # Explicaciones conceptuales
+│   ├── reference/               # Referencia técnica
+│   └── bmgd/                    # BMAD Game Development
 ├── content/                     # Contenido MCP-ready (generado, en .gitignore)
 │   ├── core/                    # Transformado desde _bmad/ via sync-content
 │   ├── bmm/
-│   └── utility/
+│   ├── utility/
+│   └── docs/                    # Transformado desde _docs/ via sync-content
 ├── scripts/
 │   └── sync-content.ts          # _bmad/ → content/ con transformaciones MCP
 ├── Dockerfile                   # Build multi-stage para producción
@@ -779,7 +841,7 @@ bmad-mcp/
 
 ### ¿Todavía necesito instalar BMAD por proyecto?
 
-**No.** Ese es precisamente el objetivo. El servidor MCP empaqueta todo el contenido BMAD y lo sirve bajo demanda. No necesitas el directorio `_bmad/` en tus proyectos.
+**No.** Ese es precisamente el objetivo. El servidor MCP empaqueta todo el contenido BMAD-S y lo sirve bajo demanda. No necesitas el directorio `_bmad/` en tus proyectos.
 
 ### ¿Funciona offline?
 
@@ -794,11 +856,11 @@ bmad-mcp/
 - **stdio** (default) — El IDE lanza el servidor como subproceso. Rápido, funciona offline, sin configuración de red.
 - **HTTP** — El servidor corre como servicio web. Útil para compartir con el equipo o acceso remoto desde múltiples máquinas.
 
-### ¿Cómo actualizo el contenido BMAD?
+### ¿Cómo actualizo el contenido BMAD-S?
 
 Si ejecutas desde código fuente:
 ```bash
-npm run sync-content   # Obtener lo último del repo BMAD-S
+npm run sync-content   # Regenerar content/ desde _bmad/ y _docs/
 npm run build          # Recompilar
 ```
 
