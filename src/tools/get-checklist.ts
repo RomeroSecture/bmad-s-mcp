@@ -27,14 +27,14 @@ export function getChecklist(
     // Try reading the workflow file to find validation reference
     const entry = registry.findByPath(workflowDir);
     if (entry) {
-      const content = reader.readAbsolute(entry.absolutePath);
+      const content = reader.readRaw(entry.absolutePath);
       if (content && entry.format === 'yaml') {
         try {
           const wfYaml = yaml.load(content) as WorkflowYaml;
           if (wfYaml?.validation) {
             const validationEntry = registry.findByPath(wfYaml.validation);
             if (validationEntry) {
-              return reader.readAbsolute(validationEntry.absolutePath);
+              return reader.readAbsolute(validationEntry.absolutePath, validationEntry.relativePath);
             }
           }
         } catch {
@@ -56,7 +56,7 @@ export function getChecklist(
       e.relativePath.toLowerCase().includes(pattern)
     );
     if (match) {
-      return reader.readAbsolute(match.absolutePath);
+      return reader.readAbsolute(match.absolutePath, match.relativePath);
     }
   }
 

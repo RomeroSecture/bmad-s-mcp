@@ -26,7 +26,7 @@ export function getWorkflow(
     );
 
     for (const csvEntry of csvFiles) {
-      const csvContent = reader.readAbsolute(csvEntry.absolutePath);
+      const csvContent = reader.readRaw(csvEntry.absolutePath);
       if (!csvContent) continue;
 
       const entries = parseModuleHelp(csvContent);
@@ -46,7 +46,7 @@ export function getWorkflow(
   const entry = registry.findByPath(workflowPath);
   if (!entry) return null;
 
-  const content = reader.readAbsolute(entry.absolutePath);
+  const content = reader.readAbsolute(entry.absolutePath, entry.relativePath);
   if (!content) return null;
 
   // If the workflow is YAML, include a hint about workflow.xml engine

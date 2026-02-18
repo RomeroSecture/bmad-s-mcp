@@ -461,152 +461,79 @@ El servidor MCP es un **servidor de contenido** — sirve el contenido de la met
 
 ## Migración: De Archivos Locales a MCP
 
-Si antes usabas BMAD con la instalación por proyecto (`npx bmad-method install`), los workflows contenían referencias a archivos locales en el directorio `_bmad/`. Con el servidor MCP, **todas esas referencias se reemplazan por llamadas a tools MCP**.
+Si antes usabas BMAD con la instalación por proyecto (`npx bmad-method install`), los workflows contenían referencias a archivos locales en el directorio `_bmad/`. Con el servidor MCP, **todas esas referencias se transforman automáticamente a llamadas MCP**. No necesitas hacer nada manualmente.
 
-### Tabla de Equivalencias
+### Transformación Automática
 
-La siguiente tabla muestra cómo cada tipo de referencia en archivos `_bmad/` se traduce a una llamada MCP:
+El servidor incluye un **Content Transformer** que procesa todo el contenido antes de servirlo. Cuando un workflow, step o agente contiene una referencia como:
 
-| Referencia en archivo local | Tool MCP equivalente | Ejemplo |
+```
+Read fully and follow: {project-root}/_bmad/core/workflows/brainstorming/steps/step-01.md
+```
+
+El servidor lo transforma automáticamente a:
+
+```
+Read fully and follow: bmad_get_step({"workflow_path":"core/workflows/brainstorming","step_file":"step-01.md"})
+```
+
+La IA del IDE recibe directamente la instrucción MCP y sabe qué tool llamar, sin necesidad de interpretar rutas de archivos locales.
+
+### Patrones que se Transforman
+
+El transformador maneja **todos** los patrones de referencia del contenido BMAD:
+
+| Patrón en archivo original | Se transforma a | Ejemplo |
 |---|---|---|
-| `{project-root}/_bmad/bmm/agents/architect.agent.yaml` | `bmad_get_agent` | `{ "agent_id": "architect" }` |
-| `{project-root}/_bmad/bmm/module-help.csv` | `bmad_list_workflows` | `{ "module": "bmm" }` |
-| `{installed_path}/workflow.md` | `bmad_get_workflow` | `{ "workflow_code": "CP" }` |
-| `./steps/step-01-init.md` | `bmad_get_step` | `{ "workflow_path": "bmm/workflows/...", "step_file": "step-01-init.md" }` |
-| `{installed_path}/templates/prd-template.md` | `bmad_get_template` | `{ "template_path": "bmm/workflows/.../templates/prd-template.md" }` |
-| `{installed_path}/brain-methods.csv` | `bmad_get_data` | `{ "data_path": "core/workflows/brainstorming/brain-methods.csv" }` |
-| `{project-root}/_bmad/core/config.yaml` | `bmad_get_config` | `{}` |
-| `{project-root}/_bmad/core/tasks/workflow.xml` | `bmad_get_task` | `{ "task_name": "workflow" }` |
-| `{project-root}/_bmad/core/tasks/help.md` | `bmad_get_task` | `{ "task_name": "help" }` |
-| `{project-root}/_bmad/bmm/protocols/execution-logging-protocol.md` | `bmad_get_protocol` | `{ "protocol_name": "ELP" }` |
-| `{project-root}/_bmad/_config/agent-manifest.csv` | `bmad_list_agents` | `{ "module": "all" }` |
-| `{project-root}/_bmad/_config/workflow-manifest.csv` | `bmad_list_workflows` | `{}` |
+| `{project-root}/_bmad/bmm/agents/X.agent.yaml` | `bmad_get_agent(...)` | `bmad_get_agent({ "agent_id": "architect" })` |
+| `{project-root}/_bmad/core/config.yaml` | `bmad_get_config(...)` | `bmad_get_config({})` |
+| `{project-root}/_bmad/core/tasks/workflow.xml` | `bmad_get_task(...)` | `bmad_get_task({ "task_name": "workflow" })` |
+| `{project-root}/_bmad/bmm/protocols/...` | `bmad_get_protocol(...)` | `bmad_get_protocol({ "protocol_name": "ELP" })` |
+| `{installed_path}/steps/step-02.md` | `bmad_get_step(...)` | Con workflow_path y step_file resueltos |
+| `{installed_path}/templates/prd-template.md` | `bmad_get_template(...)` | Con template_path completo |
+| `{installed_path}/brain-methods.csv` | `bmad_get_data(...)` | Con data_path completo |
+| `./steps/step-02-discovery.md` | `bmad_get_step(...)` | Rutas relativas resueltas según contexto del archivo |
+| `../templates/prd-template.md` | `bmad_get_template(...)` | Rutas relativas resueltas |
+| `Read fully and follow: <path>` | Directiva con tool MCP | La instrucción se preserva, la ruta se reemplaza |
+| `Load step: <path>` | Directiva con tool MCP | Idem |
+| `_config/agent-manifest.csv` | `bmad_list_agents(...)` | Manifests internos mapeados a tools de lista |
+| `_config/workflow-manifest.csv` | `bmad_list_workflows(...)` | Idem |
+| Frontmatter: `nextStepFile`, `prdTemplate`, etc. | Comentario YAML con tool hint | `nextStepFile: './step-02.md' # → bmad_get_step(...)` |
 
-### Patrones de Importación Detallados
+### Ejemplo Real: Workflow Brainstorming
 
-#### 1. Carga de Agentes
+**Contenido original** (como está en `_bmad/`):
+```markdown
+### Configuration Loading
+Load config from `{project-root}/_bmad/core/config.yaml` and resolve...
 
-**Antes** (lectura de archivo):
-```
-Read fully: {project-root}/_bmad/bmm/agents/pm.agent.yaml
-```
+### Paths
+- `brain_techniques_path` = `{installed_path}/brain-methods.csv`
+- `advancedElicitationTask` = `{project-root}/_bmad/core/workflows/advanced-elicitation/workflow.xml`
 
-**Ahora** (tool MCP):
-```
-bmad_get_agent({ "agent_id": "pm" })
-```
-
-El tool resuelve el nombre del agente con fuzzy matching — no necesitas saber la ruta exacta.
-
-#### 2. Navegación de Steps
-
-Los workflows referencian sus steps con rutas relativas. Antes la IA leía los archivos directamente:
-
-**Antes**:
-```
-Read fully and follow: ./steps/step-02-discovery.md
+## EXECUTION
+Read fully and follow: `steps/step-01-session-setup.md`
 ```
 
-**Ahora**:
-```
-bmad_get_step({
-  "workflow_path": "bmm/workflows/2-plan-workflows/create-ux-design",
-  "step_file": "step-02-discovery.md"
-})
-```
+**Lo que recibe la IA del IDE** (transformado):
+```markdown
+### Configuration Loading
+Load config from `bmad_get_config({})` and resolve...
 
-El tool resuelve automáticamente los subdirectorios de steps (`steps/`, `steps-v/`, `steps-c/`, `steps-e/`).
+### Paths
+- `brain_techniques_path` = `bmad_get_data({ "data_path": "core/workflows/brainstorming/brain-methods.csv" })`
+- `advancedElicitationTask` = `bmad_get_workflow({ "workflow_path": "core/workflows/advanced-elicitation/workflow.xml" })`
 
-#### 3. Carga de Workflows por Código
-
-Cada workflow tiene un código corto (2-3 letras) definido en `module-help.csv`. En vez de buscar el archivo manualmente:
-
-**Antes**:
-```
-1. Leer module-help.csv
-2. Buscar la fila con código "CP"
-3. Obtener la ruta del workflow
-4. Leer el archivo en esa ruta
+## EXECUTION
+Read fully and follow: bmad_get_step({"workflow_path":"core/workflows/brainstorming","step_file":"step-01-session-setup.md"})
 ```
 
-**Ahora**:
-```
-bmad_get_workflow({ "workflow_code": "CP" })
-```
+### Qué NO se Transforma
 
-Una sola llamada hace todo el lookup.
-
-#### 4. Carga de Configuración con Variables
-
-BMAD usa un sistema de variables como `{project-root}`, `{output_folder}`, `{{date}}`, `{{project_name}}`. Con archivos locales, la IA debía resolverlas manualmente.
-
-**Antes**:
-```
-1. Leer {project-root}/_bmad/bmm/config.yaml
-2. Resolver {project-root} → /Users/antonio/mi-proyecto
-3. Resolver {{date}} → 2026-02-18
-4. Sustituir todas las ocurrencias
-```
-
-**Ahora**:
-```
-bmad_get_config({})
-```
-
-El servidor resuelve **todas las variables automáticamente** y devuelve la configuración final.
-
-#### 5. Templates con Placeholders
-
-Los templates se entregan **verbatim** (sin modificar), preservando los placeholders para que la IA los rellene durante la ejecución del workflow:
-
-**Antes**:
-```
-Read: {installed_path}/templates/prd-template.md
-```
-
-**Ahora**:
-```
-bmad_get_template({
-  "template_path": "bmm/workflows/2-plan-workflows/create-prd/templates/prd-template.md"
-})
-```
-
-#### 6. Cross-Workflow (Sub-workflows)
-
-Algunos steps invocan otros workflows como sub-procesos (ej: Advanced Elicitation o Party Mode desde un step de UX Design):
-
-**Antes**:
-```
-When 'A' selected: Read fully and follow: {project-root}/_bmad/core/workflows/advanced-elicitation/workflow.xml
-When 'P' selected: Read fully and follow: {project-root}/_bmad/core/workflows/party-mode/workflow.md
-```
-
-**Ahora**:
-```
-// Para workflow.xml
-bmad_get_task({ "task_name": "workflow" })
-
-// Para party-mode
-bmad_get_workflow({ "workflow_path": "core/workflows/party-mode/workflow.md" })
-```
-
-#### 7. Búsqueda de Contenido
-
-**Antes**: navegar manualmente por los directorios `_bmad/` buscando archivos relevantes.
-
-**Ahora**:
-```
-bmad_search_content({ "query": "sprint planning", "file_types": ["md", "yaml"] })
-```
-
-Búsqueda full-text en los 262 archivos con contexto de línea.
-
-### Notas Importantes de Migración
-
-- **Los archivos de salida siguen siendo locales** — El MCP solo sirve contenido BMAD. Los documentos generados (PRDs, arquitectura, stories) se escriben en `{output_folder}/` del proyecto local, igual que antes.
-- **El frontmatter de estado se mantiene** — Los workflows siguen usando frontmatter YAML en los documentos de salida para rastrear progreso (`stepsCompleted`, etc.).
-- **No necesitas rutas exactas** — Los tools MCP aceptan nombres, códigos y rutas parciales con fuzzy matching.
-- **Las variables se resuelven automáticamente** — `{project-root}`, `{output_folder}`, `{{date}}`, etc. se resuelven en el servidor.
+- **Archivos de salida** — Rutas como `{output_folder}/brainstorming/session.md` se mantienen intactas, ya que son archivos que se escriben en el proyecto local del usuario.
+- **Variables de configuración** — `{user_name}`, `{{date}}`, `{communication_language}` se resuelven por separado vía `bmad_get_config`.
+- **Contenido CSV/YAML interno** — Los archivos que el servidor parsea internamente (module-help.csv, agent YAML) se leen sin transformar para no romper el parsing.
+- **Resultados de búsqueda** — `bmad_search_content` devuelve contenido crudo para búsqueda precisa.
 
 ---
 

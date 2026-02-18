@@ -35,6 +35,7 @@ bmad-mcp/
 │   ├── resources/
 │   │   └── index.ts             # 5 MCP resources (bmad://*)
 │   └── utils/
+│       ├── content-transformer.ts # Rewrites _bmad/ file refs → MCP tool calls
 │       ├── csv-parser.ts        # Parses module-help.csv → WorkflowEntry[]
 │       ├── yaml-parser.ts       # Parses agent YAML → AgentDefinition
 │       └── path-resolver.ts     # Content root + _bmad/ path translation
@@ -61,9 +62,24 @@ npm test               # Run vitest
 
 - **Content is bundled statically** in `content/` — 262 files, ~2.1 MB. No network dependency at runtime.
 - **ContentRegistry** indexes all files at startup into an in-memory Map for fast lookup.
+- **Content Transformer** automatically rewrites `_bmad/` file references into MCP tool calls when serving content.
 - **15 granular tools** (not few large ones) — LLMs work better with small, focused tool schemas.
 - **Stateless server** — the LLM manages conversational state; BMAD manages document state via frontmatter.
 - **Config resolution order**: env vars > local project config (`_bmad/bmm/config.yaml`) > Zod defaults.
+
+## Content Transformer (`src/utils/content-transformer.ts`)
+
+All content delivered by `get-*` tools passes through `transformContent()` which rewrites local file references into MCP tool calls. This is what makes the MCP server a drop-in replacement for per-project `_bmad/` installation.
+
+**Patterns handled:**
+1. `{project-root}/_bmad/...` → classifies path and maps to appropriate `bmad_get_*` tool
+2. `{installed_path}/...` → resolves relative to the current workflow dir
+3. Relative step paths (`./steps/step-02.md`) → `bmad_get_step` with resolved workflow_path
+4. `Read fully and follow:` / `Load step:` directives → replaces the path with tool call
+5. Manifest CSV references (`agent-manifest.csv`, etc.) → `bmad_list_agents`, `bmad_list_workflows`
+6. Frontmatter refs (`nextStepFile`, `prdTemplate`) → adds YAML comment with tool hint
+
+**Important:** Tools that parse content internally (`list-agents`, `list-workflows`, `bmad-help`, `search-content`) use `reader.readRaw()` to get untransformed content. Only user-facing content delivery uses `reader.readAbsolute(path, relativePath)` to trigger transformation.
 
 ## Tools (15)
 

@@ -28,7 +28,7 @@ export function listAgents(
   const agents: AgentSummary[] = [];
 
   for (const entry of agentEntries) {
-    const content = reader.readAbsolute(entry.absolutePath);
+    const content = reader.readRaw(entry.absolutePath);
     if (!content) continue;
 
     const parsed = parseAgentYaml(content);

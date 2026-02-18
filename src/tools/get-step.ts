@@ -34,10 +34,10 @@ export function getStep(
     const altPath = `${workflowDir}/${input.step_file}`;
     const altEntry = registry.findByPath(altPath);
     if (altEntry) {
-      return reader.readAbsolute(altEntry.absolutePath);
+      return reader.readAbsolute(altEntry.absolutePath, altEntry.relativePath);
     }
     return null;
   }
 
-  return reader.readAbsolute(entry.absolutePath);
+  return reader.readAbsolute(entry.absolutePath, entry.relativePath);
 }

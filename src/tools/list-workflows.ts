@@ -28,7 +28,7 @@ export function listWorkflows(
   let allWorkflows: WorkflowEntry[] = [];
 
   for (const csvEntry of allCsvEntries) {
-    const content = reader.readAbsolute(csvEntry.absolutePath);
+    const content = reader.readRaw(csvEntry.absolutePath);
     if (!content) continue;
 
     const entries = parseModuleHelp(content);

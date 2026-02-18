@@ -15,5 +15,5 @@ export function getTemplate(
 ): string | null {
   const entry = registry.findByPath(input.template_path);
   if (!entry) return null;
-  return reader.readAbsolute(entry.absolutePath);
+  return reader.readAbsolute(entry.absolutePath, entry.relativePath);
 }

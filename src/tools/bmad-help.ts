@@ -25,7 +25,7 @@ export function bmadHelp(
 
   const allWorkflows: WorkflowEntry[] = [];
   for (const csvEntry of csvFiles) {
-    const content = reader.readAbsolute(csvEntry.absolutePath);
+    const content = reader.readRaw(csvEntry.absolutePath);
     if (!content) continue;
     allWorkflows.push(...parseModuleHelp(content));
   }

@@ -36,7 +36,7 @@ export function searchContent(
   const results: SearchResult[] = [];
 
   for (const entry of entries) {
-    const content = reader.readAbsolute(entry.absolutePath);
+    const content = reader.readRaw(entry.absolutePath);
     if (!content) continue;
 
     const lines = content.split('\n');

@@ -35,5 +35,5 @@ export function getProtocol(
   }
 
   if (!match) return null;
-  return reader.readAbsolute(match.absolutePath);
+  return reader.readAbsolute(match.absolutePath, match.relativePath);
 }

@@ -27,5 +27,5 @@ export function getAgent(
   }
 
   if (!entry) return null;
-  return reader.readAbsolute(entry.absolutePath);
+  return reader.readAbsolute(entry.absolutePath, entry.relativePath);
 }
