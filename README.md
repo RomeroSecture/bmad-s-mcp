@@ -24,6 +24,7 @@
 - [Agentes](#agentes)
 - [Workflows](#workflows)
 - [Cómo Funciona](#cómo-funciona)
+- [Migración: De Archivos Locales a MCP](#migración-de-archivos-locales-a-mcp)
 - [Ejemplos de Uso](#ejemplos-de-uso)
 - [Self-Hosting](#self-hosting)
 - [Desarrollo](#desarrollo)
@@ -455,6 +456,157 @@ El servidor MCP es un **servidor de contenido** — sirve el contenido de la met
 - **Indexado al arrancar** — Cada archivo se categoriza e indexa en un registro en memoria para búsquedas en sub-milisegundos.
 - **Sin estado** — El servidor no tiene estado de sesión. La IA gestiona el contexto conversacional; BMAD gestiona el estado de documentos vía archivos de salida.
 - **Tools granulares** — 15 tools pequeños y enfocados en vez de pocos grandes. Los LLMs funcionan mejor con schemas de tools específicos.
+
+---
+
+## Migración: De Archivos Locales a MCP
+
+Si antes usabas BMAD con la instalación por proyecto (`npx bmad-method install`), los workflows contenían referencias a archivos locales en el directorio `_bmad/`. Con el servidor MCP, **todas esas referencias se reemplazan por llamadas a tools MCP**.
+
+### Tabla de Equivalencias
+
+La siguiente tabla muestra cómo cada tipo de referencia en archivos `_bmad/` se traduce a una llamada MCP:
+
+| Referencia en archivo local | Tool MCP equivalente | Ejemplo |
+|---|---|---|
+| `{project-root}/_bmad/bmm/agents/architect.agent.yaml` | `bmad_get_agent` | `{ "agent_id": "architect" }` |
+| `{project-root}/_bmad/bmm/module-help.csv` | `bmad_list_workflows` | `{ "module": "bmm" }` |
+| `{installed_path}/workflow.md` | `bmad_get_workflow` | `{ "workflow_code": "CP" }` |
+| `./steps/step-01-init.md` | `bmad_get_step` | `{ "workflow_path": "bmm/workflows/...", "step_file": "step-01-init.md" }` |
+| `{installed_path}/templates/prd-template.md` | `bmad_get_template` | `{ "template_path": "bmm/workflows/.../templates/prd-template.md" }` |
+| `{installed_path}/brain-methods.csv` | `bmad_get_data` | `{ "data_path": "core/workflows/brainstorming/brain-methods.csv" }` |
+| `{project-root}/_bmad/core/config.yaml` | `bmad_get_config` | `{}` |
+| `{project-root}/_bmad/core/tasks/workflow.xml` | `bmad_get_task` | `{ "task_name": "workflow" }` |
+| `{project-root}/_bmad/core/tasks/help.md` | `bmad_get_task` | `{ "task_name": "help" }` |
+| `{project-root}/_bmad/bmm/protocols/execution-logging-protocol.md` | `bmad_get_protocol` | `{ "protocol_name": "ELP" }` |
+| `{project-root}/_bmad/_config/agent-manifest.csv` | `bmad_list_agents` | `{ "module": "all" }` |
+| `{project-root}/_bmad/_config/workflow-manifest.csv` | `bmad_list_workflows` | `{}` |
+
+### Patrones de Importación Detallados
+
+#### 1. Carga de Agentes
+
+**Antes** (lectura de archivo):
+```
+Read fully: {project-root}/_bmad/bmm/agents/pm.agent.yaml
+```
+
+**Ahora** (tool MCP):
+```
+bmad_get_agent({ "agent_id": "pm" })
+```
+
+El tool resuelve el nombre del agente con fuzzy matching — no necesitas saber la ruta exacta.
+
+#### 2. Navegación de Steps
+
+Los workflows referencian sus steps con rutas relativas. Antes la IA leía los archivos directamente:
+
+**Antes**:
+```
+Read fully and follow: ./steps/step-02-discovery.md
+```
+
+**Ahora**:
+```
+bmad_get_step({
+  "workflow_path": "bmm/workflows/2-plan-workflows/create-ux-design",
+  "step_file": "step-02-discovery.md"
+})
+```
+
+El tool resuelve automáticamente los subdirectorios de steps (`steps/`, `steps-v/`, `steps-c/`, `steps-e/`).
+
+#### 3. Carga de Workflows por Código
+
+Cada workflow tiene un código corto (2-3 letras) definido en `module-help.csv`. En vez de buscar el archivo manualmente:
+
+**Antes**:
+```
+1. Leer module-help.csv
+2. Buscar la fila con código "CP"
+3. Obtener la ruta del workflow
+4. Leer el archivo en esa ruta
+```
+
+**Ahora**:
+```
+bmad_get_workflow({ "workflow_code": "CP" })
+```
+
+Una sola llamada hace todo el lookup.
+
+#### 4. Carga de Configuración con Variables
+
+BMAD usa un sistema de variables como `{project-root}`, `{output_folder}`, `{{date}}`, `{{project_name}}`. Con archivos locales, la IA debía resolverlas manualmente.
+
+**Antes**:
+```
+1. Leer {project-root}/_bmad/bmm/config.yaml
+2. Resolver {project-root} → /Users/antonio/mi-proyecto
+3. Resolver {{date}} → 2026-02-18
+4. Sustituir todas las ocurrencias
+```
+
+**Ahora**:
+```
+bmad_get_config({})
+```
+
+El servidor resuelve **todas las variables automáticamente** y devuelve la configuración final.
+
+#### 5. Templates con Placeholders
+
+Los templates se entregan **verbatim** (sin modificar), preservando los placeholders para que la IA los rellene durante la ejecución del workflow:
+
+**Antes**:
+```
+Read: {installed_path}/templates/prd-template.md
+```
+
+**Ahora**:
+```
+bmad_get_template({
+  "template_path": "bmm/workflows/2-plan-workflows/create-prd/templates/prd-template.md"
+})
+```
+
+#### 6. Cross-Workflow (Sub-workflows)
+
+Algunos steps invocan otros workflows como sub-procesos (ej: Advanced Elicitation o Party Mode desde un step de UX Design):
+
+**Antes**:
+```
+When 'A' selected: Read fully and follow: {project-root}/_bmad/core/workflows/advanced-elicitation/workflow.xml
+When 'P' selected: Read fully and follow: {project-root}/_bmad/core/workflows/party-mode/workflow.md
+```
+
+**Ahora**:
+```
+// Para workflow.xml
+bmad_get_task({ "task_name": "workflow" })
+
+// Para party-mode
+bmad_get_workflow({ "workflow_path": "core/workflows/party-mode/workflow.md" })
+```
+
+#### 7. Búsqueda de Contenido
+
+**Antes**: navegar manualmente por los directorios `_bmad/` buscando archivos relevantes.
+
+**Ahora**:
+```
+bmad_search_content({ "query": "sprint planning", "file_types": ["md", "yaml"] })
+```
+
+Búsqueda full-text en los 262 archivos con contexto de línea.
+
+### Notas Importantes de Migración
+
+- **Los archivos de salida siguen siendo locales** — El MCP solo sirve contenido BMAD. Los documentos generados (PRDs, arquitectura, stories) se escriben en `{output_folder}/` del proyecto local, igual que antes.
+- **El frontmatter de estado se mantiene** — Los workflows siguen usando frontmatter YAML en los documentos de salida para rastrear progreso (`stepsCompleted`, etc.).
+- **No necesitas rutas exactas** — Los tools MCP aceptan nombres, códigos y rutas parciales con fuzzy matching.
+- **Las variables se resuelven automáticamente** — `{project-root}`, `{output_folder}`, `{{date}}`, etc. se resuelven en el servidor.
 
 ---
 
