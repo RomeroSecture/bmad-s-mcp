@@ -5,6 +5,7 @@ RUN npm ci
 COPY tsconfig.json ./
 COPY src/ ./src/
 COPY _bmad/ ./_bmad/
+COPY _docs/ ./_docs/
 COPY scripts/ ./scripts/
 RUN npm run build
 

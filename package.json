@@ -10,7 +10,8 @@
   "files": [
     "dist/",
     "content/",
-    "_bmad/"
+    "_bmad/",
+    "_docs/"
   ],
   "scripts": {
     "build": "tsc",

@@ -12,9 +12,10 @@ export type ContentType =
   | 'protocol'
   | 'config'
   | 'tool'
+  | 'doc'
   | 'other';
 
-export type ContentModule = 'core' | 'bmm' | 'utility';
+export type ContentModule = 'core' | 'bmm' | 'utility' | 'docs';
 export type ContentFormat = 'md' | 'yaml' | 'csv' | 'xml' | 'txt' | 'json' | 'js' | 'sh' | 'other';
 
 export interface ContentEntry {
@@ -33,6 +34,7 @@ function inferFormat(filePath: string): ContentFormat {
 
 function inferType(relativePath: string): ContentType {
   const lower = relativePath.toLowerCase();
+  if (lower.startsWith('docs/')) return 'doc';
   if (lower.includes('/agents/') && lower.endsWith('.agent.yaml')) return 'agent';
   if (lower.includes('/workflows/') && lower.includes('/steps/')) return 'step';
   if (lower.includes('/workflows/') && (lower.includes('workflow.') || lower.includes('workflow-'))) return 'workflow';
@@ -51,6 +53,7 @@ function inferModule(relativePath: string): ContentModule {
   if (relativePath.startsWith('core/')) return 'core';
   if (relativePath.startsWith('bmm/')) return 'bmm';
   if (relativePath.startsWith('utility/')) return 'utility';
+  if (relativePath.startsWith('docs/')) return 'docs';
   return 'core';
 }
 

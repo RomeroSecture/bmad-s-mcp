@@ -16,6 +16,8 @@ import { ListDataInputSchema, listData } from './list-data.js';
 import { BmadHelpInputSchema, bmadHelp } from './bmad-help.js';
 import { GetChecklistInputSchema, getChecklist } from './get-checklist.js';
 import { SearchContentInputSchema, searchContent } from './search-content.js';
+import { ListDocsInputSchema, listDocs } from './list-docs.js';
+import { GetDocInputSchema, getDoc } from './get-doc.js';
 
 export function registerTools(server: McpServer, registry: ContentRegistry): void {
   const reader = new ContentReader(registry);
@@ -213,6 +215,40 @@ export function registerTools(server: McpServer, registry: ContentRegistry): voi
     async (input) => {
       const result = searchContent(registry, reader, input);
       return { content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }] };
+    },
+  );
+
+  // === Documentation Tools ===
+
+  server.tool(
+    'bmad_list_docs',
+    'List available BMAD-S methodology documentation (tutorials, how-to guides, explanations, reference)',
+    ListDocsInputSchema.shape,
+    async (input) => {
+      const result = listDocs(registry, input);
+      return { content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }] };
+    },
+  );
+
+  server.tool(
+    'bmad_get_doc',
+    'Get a BMAD-S methodology documentation file by path or topic (e.g., "brainstorming", "party mode", "getting started")',
+    GetDocInputSchema.shape,
+    async (input) => {
+      if (!input.doc_path && !input.topic) {
+        return {
+          content: [{ type: 'text' as const, text: 'Provide either doc_path or topic' }],
+          isError: true,
+        };
+      }
+      const result = getDoc(registry, reader, input);
+      if (!result) {
+        return {
+          content: [{ type: 'text' as const, text: `Documentation not found: ${input.doc_path || input.topic}` }],
+          isError: true,
+        };
+      }
+      return { content: [{ type: 'text' as const, text: result }] };
     },
   );
 }

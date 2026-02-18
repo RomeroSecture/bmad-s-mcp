@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-MCP (Model Context Protocol) server that serves BMAD Method content (agents, workflows, templates, data) to any AI-powered IDE (Claude Code, Cursor, Windsurf). Acts as a **content server** — the LLM remains the execution engine.
+MCP (Model Context Protocol) server that serves BMAD-S Method content (agents, workflows, templates, data, documentation) to any AI-powered IDE (Claude Code, Cursor, Windsurf). BMAD-S = BMAD (Breakthrough Method of Agile AI-driven Development) + Secture edition. Acts as a **content server** — the LLM remains the execution engine.
 
 ## Tech Stack
 
@@ -28,9 +28,9 @@ bmad-mcp/
 │   │   ├── loader.ts            # Env vars → local config → defaults
 │   │   └── variables.ts         # BMAD variable resolution ({project-root}, {{date}}, etc.)
 │   ├── content/
-│   │   ├── registry.ts          # In-memory index of all bundled content (262 files)
+│   │   ├── registry.ts          # In-memory index of all bundled content (296 files)
 │   │   └── reader.ts            # File reader with path resolution
-│   ├── tools/                   # 15 MCP tools (list-*, get-*, search, help)
+│   ├── tools/                   # 17 MCP tools (list-*, get-*, search, help, docs)
 │   │   └── index.ts             # Tool registration orchestrator
 │   ├── resources/
 │   │   └── index.ts             # 5 MCP resources (bmad://*)
@@ -43,10 +43,17 @@ bmad-mcp/
 │   ├── core/
 │   ├── bmm/
 │   └── utility/
+├── _docs/                       # Raw BMAD-S methodology documentation (committed)
+│   ├── tutorials/
+│   ├── how-to/
+│   ├── explanation/
+│   ├── reference/
+│   └── bmgd/
 ├── content/                     # Generated MCP-ready content (in .gitignore)
 │   ├── core/                    # Transformed from _bmad/ via sync-content
 │   ├── bmm/
-│   └── utility/
+│   ├── utility/
+│   └── docs/                    # Transformed from _docs/ via sync-content
 ├── scripts/
 │   └── sync-content.ts          # _bmad/ → content/ with MCP tool call rewrites
 └── test/
@@ -64,10 +71,10 @@ npm test               # Run vitest
 
 ## Key Architecture Decisions
 
-- **Content is bundled statically** in `content/` — 262 files, ~2.1 MB. No network dependency at runtime.
+- **Content is bundled statically** in `content/` — 296 files (~262 BMAD + 34 docs). No network dependency at runtime.
 - **ContentRegistry** indexes all files at startup into an in-memory Map for fast lookup.
 - **Content Transformer** automatically rewrites `_bmad/` file references into MCP tool calls when serving content.
-- **15 granular tools** (not few large ones) — LLMs work better with small, focused tool schemas.
+- **17 granular tools** (not few large ones) — LLMs work better with small, focused tool schemas.
 - **Stateless server** — the LLM manages conversational state; BMAD manages document state via frontmatter.
 - **Config resolution order**: env vars > local project config (`_bmad/bmm/config.yaml`) > Zod defaults.
 
@@ -85,7 +92,7 @@ All content delivered by `get-*` tools passes through `transformContent()` which
 
 **Important:** Tools that parse content internally (`list-agents`, `list-workflows`, `bmad-help`, `search-content`) use `reader.readRaw()` to get untransformed content. Only user-facing content delivery uses `reader.readAbsolute(path, relativePath)` to trigger transformation.
 
-## Tools (15)
+## Tools (17)
 
 | Tool | Purpose |
 |------|---------|
@@ -104,6 +111,8 @@ All content delivered by `get-*` tools passes through `transformContent()` which
 | `bmad_list_data` | Available data files by category |
 | `bmad_get_checklist` | Validation checklist for a workflow |
 | `bmad_search_content` | Full-text search across all content |
+| `bmad_list_docs` | List BMAD-S methodology documentation by category |
+| `bmad_get_doc` | Get a documentation file by path or topic |
 
 ## Resources (5)
 
@@ -112,7 +121,7 @@ All content delivered by `get-*` tools passes through `transformContent()` which
 | `bmad://config` | Resolved configuration (YAML) |
 | `bmad://catalog/workflows` | Combined workflow catalog (JSON) |
 | `bmad://catalog/agents` | Agent roster with metadata (JSON) |
-| `bmad://docs/overview` | Compiled BMAD Method overview (Markdown) |
+| `bmad://docs/overview` | BMAD-S Method overview from real documentation (Markdown) |
 | `bmad://core/workflow-engine` | workflow.xml execution engine (XML) |
 
 ## Environment Variables
@@ -130,7 +139,7 @@ All content delivered by `get-*` tools passes through `transformContent()` which
 
 ## Content Sync
 
-Raw BMAD content lives in `_bmad/` (committed to repo). The sync script transforms it into MCP-ready content in `content/` (generated, in .gitignore).
+Raw BMAD content lives in `_bmad/` and methodology docs in `_docs/` (both committed to repo). The sync script transforms both into MCP-ready content in `content/` (generated, in .gitignore).
 
 ```bash
 npm run sync-content    # _bmad/ → content/ with MCP transformations

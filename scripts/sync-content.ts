@@ -1,14 +1,15 @@
 #!/usr/bin/env tsx
 /**
- * Syncs _bmad/ content into content/ directory, applying MCP tool call
- * transformations so the server can serve MCP-ready content directly.
+ * Syncs _bmad/ and _docs/ content into content/ directory, applying MCP tool
+ * call transformations so the server can serve MCP-ready content directly.
  *
- * Source: ./_bmad/{core,bmm,utility}  (raw BMAD content, committed to repo)
- * Dest:   ./content/{core,bmm,utility} (transformed, generated)
+ * Sources:
+ *   ./_bmad/{core,bmm,utility}  → content/{core,bmm,utility}  (workflows, agents, steps)
+ *   ./_docs/                    → content/docs/                (methodology documentation)
  *
  * Usage:
- *   npm run sync-content              # sync from local _bmad/
- *   npm run sync-content -- --from /path/to/external/_bmad  # sync from external source
+ *   npm run sync-content              # sync from local _bmad/ and _docs/
+ *   npm run sync-content -- --from /path/to/external/_bmad  # sync _bmad from external source
  */
 import {
   existsSync,
@@ -105,9 +106,22 @@ for (const mod of MODULES) {
   console.log(`Synced: ${mod}`);
 }
 
+// Sync _docs/ → content/docs/
+const docsSource = resolve(projectRoot, '_docs');
+const docsDest = join(contentDest, 'docs');
+
+if (existsSync(docsSource)) {
+  mkdirSync(docsDest, { recursive: true });
+  walkAndCopy(docsSource, docsDest, 'docs');
+  console.log(`Synced: docs`);
+} else {
+  console.warn(`_docs/ not found, skipping documentation sync`);
+}
+
 console.log('');
 console.log(`Content sync complete.`);
 console.log(`  Total files: ${totalFiles}`);
 console.log(`  Transformed: ${transformedFiles} (MCP tool call rewrites)`);
-console.log(`  Source: ${bmadSource}`);
-console.log(`  Dest:   ${contentDest}`);
+console.log(`  Source _bmad: ${bmadSource}`);
+console.log(`  Source _docs: ${docsSource}`);
+console.log(`  Dest:         ${contentDest}`);

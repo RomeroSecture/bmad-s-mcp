@@ -55,64 +55,51 @@ export function registerResources(server: McpServer, registry: ContentRegistry):
     },
   );
 
-  // bmad://docs/overview — Method overview
+  // bmad://docs/overview — Method overview (from real BMAD-S documentation)
   server.resource(
     'method-overview',
     'bmad://docs/overview',
-    { description: 'Overview of the BMAD Method' },
+    { description: 'Overview of the BMAD-S Method (Secture edition)' },
     async () => {
-      // Compile an overview from available content
+      // Try to serve the real bmad-overview.md from docs
+      const overview = reader.readFromContent('docs', 'bmad-overview.md');
+      if (overview) {
+        return {
+          contents: [{
+            uri: 'bmad://docs/overview',
+            mimeType: 'text/markdown',
+            text: overview,
+          }],
+        };
+      }
+
+      // Fallback: generate from catalogs
       const workflows = listWorkflows(registry, reader, {});
       const agents = listAgents(registry, reader, { module: 'all' });
 
-      const overview = [
-        '# BMAD Method Overview',
+      const fallback = [
+        '# BMAD-S Method Overview',
         '',
-        'The **B**reakthrough **M**ethod of **A**gile AI-driven **D**evelopment (BMAD) is a comprehensive framework',
-        'for AI-assisted software development with 12+ specialized agents and 50+ workflows.',
+        'The **B**reakthrough **M**ethod of **A**gile AI-driven **D**evelopment — **S**ecture edition (BMAD-S)',
+        'is a comprehensive framework for AI-assisted software development.',
         '',
         '## Agents',
         ...agents.map((a) => `- ${a.icon} **${a.name}** (${a.title}) — ${a.role}`),
         '',
-        '## Workflow Phases',
+        '## Workflows',
+        ...workflows.map((w) => `- **${w.name}** [${w.code}] (${w.phase}) — ${w.description}`),
         '',
-        '### Anytime',
-        ...workflows
-          .filter((w) => w.phase === 'anytime')
-          .map((w) => `- **${w.name}** [${w.code}] — ${w.description}`),
+        '## Documentation',
         '',
-        '### 1. Analysis',
-        ...workflows
-          .filter((w) => w.phase === '1-analysis')
-          .map((w) => `- **${w.name}** [${w.code}] — ${w.description}`),
-        '',
-        '### 2. Planning',
-        ...workflows
-          .filter((w) => w.phase === '2-planning')
-          .map((w) => `- **${w.name}** [${w.code}] — ${w.description}`),
-        '',
-        '### 3. Solutioning',
-        ...workflows
-          .filter((w) => w.phase === '3-solutioning')
-          .map((w) => `- **${w.name}** [${w.code}] — ${w.description}`),
-        '',
-        '### 4. Implementation',
-        ...workflows
-          .filter((w) => w.phase === '4-implementation')
-          .map((w) => `- **${w.name}** [${w.code}] — ${w.description}`),
-        '',
-        '## Getting Started',
-        '',
-        'Use `bmad_help` to get routing guidance for your current project state.',
-        'Use `bmad_list_workflows` to see all available workflows.',
-        'Use `bmad_get_workflow` with a workflow code to load and execute a workflow.',
+        'Use `bmad_list_docs` to browse available methodology documentation.',
+        'Use `bmad_get_doc` with a topic to read specific guides.',
       ].join('\n');
 
       return {
         contents: [{
           uri: 'bmad://docs/overview',
           mimeType: 'text/markdown',
-          text: overview,
+          text: fallback,
         }],
       };
     },
