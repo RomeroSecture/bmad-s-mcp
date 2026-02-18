@@ -673,20 +673,36 @@ Una vez desplegado, cada miembro del equipo añade una línea a su IDE:
 git clone https://github.com/RomeroSecture/bmad-s-mcp.git
 cd bmad-mcp
 npm install
-npm run sync-content   # Copiar contenido BMAD del repo padre
-npm run build
+npm run build          # Ejecuta sync-content automáticamente via prebuild
 ```
 
 ### Comandos
 
 ```bash
-npm run build          # Compilar TypeScript → dist/
+npm run build          # sync-content + tsc (genera content/ y compila)
 npm run dev            # Ejecutar con hot reload (tsx)
 npm start              # Ejecutar servidor compilado
-npm run sync-content   # Re-sincronizar contenido del repo BMAD-S
+npm run sync-content   # Regenerar content/ desde _bmad/ con transformaciones MCP
 npm test               # Ejecutar tests
 npm run test:watch     # Ejecutar tests en modo watch
 ```
+
+### Actualizar contenido BMAD
+
+El contenido raw vive en `_bmad/` (committed al repo). Para actualizar:
+
+```bash
+# Opción 1: Copiar desde el repo padre BMAD-S
+cp -R /path/to/BMAD-S/_bmad/* ./_bmad/
+npm run build
+
+# Opción 2: Sync desde una ubicación externa
+npm run sync-content -- --from /path/to/BMAD-S/_bmad
+npm run build
+```
+
+El script `sync-content` transforma automáticamente todas las referencias a archivos locales (`{project-root}/_bmad/...`, `{installed_path}/...`, rutas relativas de steps) en llamadas a tools MCP.
+
 
 ### Probar localmente
 
@@ -725,15 +741,20 @@ bmad-mcp/
 │   ├── resources/               # 5 definiciones de resources MCP
 │   │   └── index.ts
 │   └── utils/
+│       ├── content-transformer.ts # Reescribe refs _bmad/ → llamadas MCP
 │       ├── csv-parser.ts        # Parser de module-help.csv
 │       ├── yaml-parser.ts       # Parser de YAML de agentes
 │       └── path-resolver.ts     # Traducción de rutas de contenido
-├── content/                     # Contenido BMAD empaquetado (262 archivos, ~2.1 MB)
+├── _bmad/                       # Contenido BMAD raw (fuente, committed)
 │   ├── core/                    # Tareas core, workflows y el agente maestro
 │   ├── bmm/                     # Módulo principal: agentes, workflows, protocolos
 │   └── utility/                 # Componentes de agente compartidos y templates
+├── content/                     # Contenido MCP-ready (generado, en .gitignore)
+│   ├── core/                    # Transformado desde _bmad/ via sync-content
+│   ├── bmm/
+│   └── utility/
 ├── scripts/
-│   └── sync-content.ts          # Sincroniza _bmad/ desde el repo BMAD-S
+│   └── sync-content.ts          # _bmad/ → content/ con transformaciones MCP
 ├── Dockerfile                   # Build multi-stage para producción
 ├── docker-compose.prod.yml      # Config de despliegue lista para Traefik
 └── test/                        # Suites de tests Vitest

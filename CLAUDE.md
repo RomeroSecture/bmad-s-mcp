@@ -39,12 +39,16 @@ bmad-mcp/
 │       ├── csv-parser.ts        # Parses module-help.csv → WorkflowEntry[]
 │       ├── yaml-parser.ts       # Parses agent YAML → AgentDefinition
 │       └── path-resolver.ts     # Content root + _bmad/ path translation
-├── content/                     # Bundled _bmad/ content (synced from parent repo)
+├── _bmad/                       # Raw BMAD content (source of truth, committed)
 │   ├── core/
 │   ├── bmm/
 │   └── utility/
+├── content/                     # Generated MCP-ready content (in .gitignore)
+│   ├── core/                    # Transformed from _bmad/ via sync-content
+│   ├── bmm/
+│   └── utility/
 ├── scripts/
-│   └── sync-content.ts          # Copies _bmad/{core,bmm,utility} → content/
+│   └── sync-content.ts          # _bmad/ → content/ with MCP tool call rewrites
 └── test/
 ```
 
@@ -126,14 +130,19 @@ All content delivered by `get-*` tools passes through `transformContent()` which
 
 ## Content Sync
 
-Content comes from the parent BMAD-S repo's `_bmad/` directory. To update:
+Raw BMAD content lives in `_bmad/` (committed to repo). The sync script transforms it into MCP-ready content in `content/` (generated, in .gitignore).
 
 ```bash
-npm run sync-content
-npm run build
+npm run sync-content    # _bmad/ → content/ with MCP transformations
+npm run build           # runs sync-content automatically via prebuild
 ```
 
-This copies `_bmad/{core,bmm,utility}` into `content/`, excluding `_module-installer/` directories.
+To update from an external BMAD-S repo:
+```bash
+npm run sync-content -- --from /path/to/BMAD-S/_bmad
+```
+
+The sync applies `content-transformer.ts` to every .md/.yaml/.xml/.txt file, rewriting `{project-root}/_bmad/` paths, `{installed_path}/` refs, relative step paths, and load directives into MCP tool calls.
 
 ## Testing with MCP Inspector
 
