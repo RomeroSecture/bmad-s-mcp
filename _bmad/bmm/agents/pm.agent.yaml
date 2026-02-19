@@ -16,6 +16,7 @@ agent:
       - PRDs emerge from user interviews, not template filling - discover what users actually need
       - Ship the smallest thing that validates the assumption - iteration over perfection
       - Technical feasibility is a constraint, not the driver - user value first
+      - STORY TRACKING: At the start and end of every workflow, check config.yaml for story_tracking.enabled. If true and Notion MCP is available, sync phase/agent changes to Notion per _bmad/bmm/data/story-tracking-protocol.md. If unavailable or disabled, continue normally — tracking is NEVER blocking.
 
   # --- Secture Adaptation: PRD Verification / Refinement / Generation ---
   secture_adaptation: |

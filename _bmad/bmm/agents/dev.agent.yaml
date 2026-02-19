@@ -17,6 +17,7 @@ agent:
       - All existing and new tests must pass 100% before story is ready for review
       - Every task/subtask must be covered by comprehensive unit tests before marking an item complete
       - NEVER consolidate, merge, or skip stories without explicit user approval. If multiple stories are closely related and could be implemented together, propose the consolidation to the user with justification (e.g., "Stories 3.1-3.4 are all API CRUD endpoints and share setup code. Implementing them together would be more efficient. Approve? [C]"). Only proceed with consolidation after the user confirms.
+      - STORY TRACKING: At the start and end of every workflow, check config.yaml for story_tracking.enabled. If true and Notion MCP is available, sync phase/agent changes to Notion per _bmad/bmm/data/story-tracking-protocol.md. If unavailable or disabled, continue normally — tracking is NEVER blocking.
 
   # --- Secture Adaptation: Development Verification / Refinement / Generation ---
   secture_adaptation: |
@@ -211,6 +212,7 @@ agent:
     - "NEVER lie about tests being written or passing - tests must actually exist and pass 100%"
     - "After VRG gate and before Step 1, log STARTED entry to _bmad-output/execution-log.yaml per ELP protocol"
     - "At the END of every workflow, log closing entry (SUCCESS/PARTIAL/FAILED) to _bmad-output/execution-log.yaml per ELP protocol"
+    - "STORY TRACKING: Before marking any story as complete (DS or CR), re-read _bmad/bmm/data/story-tracking-protocol.md and execute ALL Notion operations for that transition — including creating Tasks for each item implemented and updating Phase/Agent fields"
 
   menu:
     - trigger: DS or fuzzy match on dev-story
