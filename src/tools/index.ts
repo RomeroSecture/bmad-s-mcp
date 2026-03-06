@@ -19,25 +19,41 @@ import { SearchContentInputSchema, searchContent } from './search-content.js';
 import { ListDocsInputSchema, listDocs } from './list-docs.js';
 import { GetDocInputSchema, getDoc } from './get-doc.js';
 
+/** All BMAD tools are read-only: they serve content but never modify anything */
+const READ_ONLY = {
+  readOnlyHint: true,
+  destructiveHint: false,
+  idempotentHint: true,
+  openWorldHint: false,
+} as const;
+
 export function registerTools(server: McpServer, registry: ContentRegistry): void {
   const reader = new ContentReader(registry);
 
   // === Phase 1: MVP Tools ===
 
-  server.tool(
+  server.registerTool(
     'bmad_list_agents',
-    'List all BMAD agents with their metadata, roles, and available workflow codes',
-    ListAgentsInputSchema.shape,
+    {
+      title: 'List Agents',
+      description: 'List all BMAD agents with their metadata, roles, and available workflow codes',
+      inputSchema: ListAgentsInputSchema.shape,
+      annotations: READ_ONLY,
+    },
     async (input) => {
       const result = listAgents(registry, reader, input);
       return { content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }] };
     },
   );
 
-  server.tool(
+  server.registerTool(
     'bmad_get_agent',
-    'Get the complete YAML definition of a BMAD agent (persona, role, menu)',
-    GetAgentInputSchema.shape,
+    {
+      title: 'Get Agent',
+      description: 'Get the complete YAML definition of a BMAD agent (persona, role, menu)',
+      inputSchema: GetAgentInputSchema.shape,
+      annotations: READ_ONLY,
+    },
     async (input) => {
       const result = getAgent(registry, reader, input);
       if (!result) {
@@ -47,20 +63,28 @@ export function registerTools(server: McpServer, registry: ContentRegistry): voi
     },
   );
 
-  server.tool(
+  server.registerTool(
     'bmad_list_workflows',
-    'List all available BMAD workflows from module-help.csv catalogs, with name, code, phase, agent, and description',
-    ListWorkflowsInputSchema.shape,
+    {
+      title: 'List Workflows',
+      description: 'List all available BMAD workflows from module-help.csv catalogs, with name, code, phase, agent, and description',
+      inputSchema: ListWorkflowsInputSchema.shape,
+      annotations: READ_ONLY,
+    },
     async (input) => {
       const result = listWorkflows(registry, reader, input);
       return { content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }] };
     },
   );
 
-  server.tool(
+  server.registerTool(
     'bmad_get_workflow',
-    'Get the content of a BMAD workflow by its code (e.g., "CP", "CA") or direct path',
-    GetWorkflowInputSchema.shape,
+    {
+      title: 'Get Workflow',
+      description: 'Get the content of a BMAD workflow by its code (e.g., "CP", "CA") or direct path',
+      inputSchema: GetWorkflowInputSchema.shape,
+      annotations: READ_ONLY,
+    },
     async (input) => {
       if (!input.workflow_code && !input.workflow_path) {
         return {
@@ -83,15 +107,19 @@ export function registerTools(server: McpServer, registry: ContentRegistry): voi
     },
   );
 
-  server.tool(
+  server.registerTool(
     'bmad_get_step',
-    'Get the content of a specific step file from a BMAD workflow',
-    GetStepInputSchema.shape,
+    {
+      title: 'Get Workflow Step',
+      description: 'Get the content of a specific step file from a BMAD workflow',
+      inputSchema: GetStepInputSchema.shape,
+      annotations: READ_ONLY,
+    },
     async (input) => {
       const result = getStep(registry, reader, input);
       if (!result) {
         return {
-          content: [{ type: 'text' as const, text: `Step not found: ${input.step_file} in ${input.workflow_path}/${input.steps_dir}` }],
+          content: [{ type: 'text' as const, text: `Step not found: ${input.step_file} in ${input.workflow_path}/${input.steps_dir}. Not all workflows use step files — some use instructions.xml/instructions.md instead. Use bmad_get_workflow with the workflow_path to read the full workflow content.` }],
           isError: true,
         };
       }
@@ -99,10 +127,14 @@ export function registerTools(server: McpServer, registry: ContentRegistry): voi
     },
   );
 
-  server.tool(
+  server.registerTool(
     'bmad_get_template',
-    'Get a BMAD template file with placeholders intact',
-    GetTemplateInputSchema.shape,
+    {
+      title: 'Get Template',
+      description: 'Get a BMAD template file with placeholders intact',
+      inputSchema: GetTemplateInputSchema.shape,
+      annotations: READ_ONLY,
+    },
     async (input) => {
       const result = getTemplate(registry, reader, input);
       if (!result) {
@@ -112,10 +144,14 @@ export function registerTools(server: McpServer, registry: ContentRegistry): voi
     },
   );
 
-  server.tool(
+  server.registerTool(
     'bmad_get_data',
-    'Get a BMAD data file (CSV, JSON, reference data)',
-    GetDataInputSchema.shape,
+    {
+      title: 'Get Data File',
+      description: 'Get a BMAD data file (CSV, JSON, reference data)',
+      inputSchema: GetDataInputSchema.shape,
+      annotations: READ_ONLY,
+    },
     async (input) => {
       const result = getData(registry, reader, input);
       if (!result) {
@@ -125,10 +161,14 @@ export function registerTools(server: McpServer, registry: ContentRegistry): voi
     },
   );
 
-  server.tool(
+  server.registerTool(
     'bmad_get_task',
-    'Get a BMAD task definition (e.g., "workflow" for the workflow.xml engine, "help" for the help routing)',
-    GetTaskInputSchema.shape,
+    {
+      title: 'Get Task',
+      description: 'Get a BMAD task definition (e.g., "workflow" for the workflow.xml engine, "help" for the help routing)',
+      inputSchema: GetTaskInputSchema.shape,
+      annotations: READ_ONLY,
+    },
     async (input) => {
       const result = getTask(registry, reader, input);
       if (!result) {
@@ -138,10 +178,14 @@ export function registerTools(server: McpServer, registry: ContentRegistry): voi
     },
   );
 
-  server.tool(
+  server.registerTool(
     'bmad_get_config',
-    'Get the resolved BMAD configuration (env vars + local config + defaults)',
-    GetConfigInputSchema.shape,
+    {
+      title: 'Get Config',
+      description: 'Get the resolved BMAD configuration (env vars + local config + defaults)',
+      inputSchema: GetConfigInputSchema.shape,
+      annotations: READ_ONLY,
+    },
     async (input) => {
       const result = getConfig(input);
       return { content: [{ type: 'text' as const, text: result }] };
@@ -150,20 +194,28 @@ export function registerTools(server: McpServer, registry: ContentRegistry): voi
 
   // === Phase 2: Enhanced Tools ===
 
-  server.tool(
+  server.registerTool(
     'bmad_help',
-    'Get routing guidance: what workflow to run next based on project state and phase progression',
-    BmadHelpInputSchema.shape,
+    {
+      title: 'BMAD Help',
+      description: 'Get routing guidance: what workflow to run next based on project state and phase progression',
+      inputSchema: BmadHelpInputSchema.shape,
+      annotations: READ_ONLY,
+    },
     async (input) => {
       const result = bmadHelp(registry, reader, input);
       return { content: [{ type: 'text' as const, text: result }] };
     },
   );
 
-  server.tool(
+  server.registerTool(
     'bmad_get_protocol',
-    'Get a BMAD protocol definition (e.g., "execution-logging-protocol", "ELP")',
-    GetProtocolInputSchema.shape,
+    {
+      title: 'Get Protocol',
+      description: 'Get a BMAD protocol definition (e.g., "execution-logging-protocol", "ELP")',
+      inputSchema: GetProtocolInputSchema.shape,
+      annotations: READ_ONLY,
+    },
     async (input) => {
       const result = getProtocol(registry, reader, input);
       if (!result) {
@@ -173,20 +225,28 @@ export function registerTools(server: McpServer, registry: ContentRegistry): voi
     },
   );
 
-  server.tool(
+  server.registerTool(
     'bmad_list_templates',
-    'List all available BMAD templates with their paths',
-    ListTemplatesInputSchema.shape,
+    {
+      title: 'List Templates',
+      description: 'List all available BMAD templates with their paths',
+      inputSchema: ListTemplatesInputSchema.shape,
+      annotations: READ_ONLY,
+    },
     async (input) => {
       const result = listTemplates(registry, input);
       return { content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }] };
     },
   );
 
-  server.tool(
+  server.registerTool(
     'bmad_list_data',
-    'List all available BMAD data files (CSV, reference data, team configs, protocols)',
-    ListDataInputSchema.shape,
+    {
+      title: 'List Data Files',
+      description: 'List all available BMAD data files (CSV, reference data, team configs, protocols)',
+      inputSchema: ListDataInputSchema.shape,
+      annotations: READ_ONLY,
+    },
     async (input) => {
       const result = listData(registry, input);
       return { content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }] };
@@ -195,10 +255,14 @@ export function registerTools(server: McpServer, registry: ContentRegistry): voi
 
   // === Phase 3: Advanced Tools ===
 
-  server.tool(
+  server.registerTool(
     'bmad_get_checklist',
-    'Get the validation checklist for a BMAD workflow',
-    GetChecklistInputSchema.shape,
+    {
+      title: 'Get Checklist',
+      description: 'Get the validation checklist for a BMAD workflow',
+      inputSchema: GetChecklistInputSchema.shape,
+      annotations: READ_ONLY,
+    },
     async (input) => {
       const result = getChecklist(registry, reader, input);
       if (!result) {
@@ -208,10 +272,14 @@ export function registerTools(server: McpServer, registry: ContentRegistry): voi
     },
   );
 
-  server.tool(
+  server.registerTool(
     'bmad_search_content',
-    'Search BMAD content files by keyword or phrase',
-    SearchContentInputSchema.shape,
+    {
+      title: 'Search Content',
+      description: 'Search BMAD content files by keyword or phrase',
+      inputSchema: SearchContentInputSchema.shape,
+      annotations: READ_ONLY,
+    },
     async (input) => {
       const result = searchContent(registry, reader, input);
       return { content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }] };
@@ -220,20 +288,28 @@ export function registerTools(server: McpServer, registry: ContentRegistry): voi
 
   // === Documentation Tools ===
 
-  server.tool(
+  server.registerTool(
     'bmad_list_docs',
-    'List available BMAD-S methodology documentation (tutorials, how-to guides, explanations, reference)',
-    ListDocsInputSchema.shape,
+    {
+      title: 'List Docs',
+      description: 'List available BMAD-S methodology documentation (tutorials, how-to guides, explanations, reference)',
+      inputSchema: ListDocsInputSchema.shape,
+      annotations: READ_ONLY,
+    },
     async (input) => {
       const result = listDocs(registry, input);
       return { content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }] };
     },
   );
 
-  server.tool(
+  server.registerTool(
     'bmad_get_doc',
-    'Get a BMAD-S methodology documentation file by path or topic (e.g., "brainstorming", "party mode", "getting started")',
-    GetDocInputSchema.shape,
+    {
+      title: 'Get Doc',
+      description: 'Get a BMAD-S methodology documentation file by path or topic (e.g., "brainstorming", "party mode", "getting started")',
+      inputSchema: GetDocInputSchema.shape,
+      annotations: READ_ONLY,
+    },
     async (input) => {
       if (!input.doc_path && !input.topic) {
         return {
