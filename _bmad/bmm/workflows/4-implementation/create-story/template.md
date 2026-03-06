@@ -47,3 +47,9 @@ so that {{benefit}}.
 ### Completion Notes List
 
 ### File List
+
+## Change Log
+
+## Status
+
+ready-for-dev

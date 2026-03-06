@@ -22,7 +22,7 @@ provider_registry:
   aws-ecs:
     name: "AWS ECS (Containers)"
     mcp: "AWS MCP Server"
-    step_file: "{steps_path}/step-provider-aws-ecs.md"
+    step_file: "{steps_path}/step-04-provider-aws-ecs.md"
     status: "active"
   aws-s3:
     name: "AWS S3 + CloudFront (Static)"

@@ -4,9 +4,9 @@ bundle:
   icon: 🚀
   description: Team capable of project analysis, design, and architecture.
 agents:
-  - analyst
-  - architect
-  - pm
-  - sm
-  - ux-designer
+  - monty
+  - frink
+  - lisa
+  - ned
+  - marge
 party: "./default-party.csv"

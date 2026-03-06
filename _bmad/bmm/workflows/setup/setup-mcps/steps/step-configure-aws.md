@@ -52,7 +52,7 @@ Based on selection, guide accordingly:
 >
 > Pásame ambas claves. Las usaré solo para la configuración.
 
-⚠️ **SECURITY:** Never commit AWS credentials to git. They go ONLY in `.cursor/mcp.json` or environment variables.
+⚠️ **SECURITY:** Never commit AWS credentials to git. They go ONLY in `.mcp.json` or environment variables.
 
 ### Option 3: Existing AWS Profile
 
@@ -131,8 +131,8 @@ Generate the MCP configuration block based on auth method:
 ```
 
 Actions:
-1. Merge into existing `.cursor/mcp.json` or create new
-2. Verify `.gitignore` includes `.cursor/mcp.json`
+1. Merge into existing `.mcp.json` or create new
+2. Verify `.gitignore` includes `.mcp.json`
 3. Ask user which AWS region to use as default
 
 Show the generated configuration and ask for confirmation before writing.
@@ -156,7 +156,7 @@ Store preference for Wiggum's workflow configuration.
 
 ## Part E: Verify Connectivity
 
-> Reinicia Cursor para cargar la nueva configuración.
+> Inicia una nueva sesión de Claude Code para cargar la nueva configuración.
 > Cuando hayas reiniciado, dime [C] y verificaré la conexión con AWS.
 
 After user confirms:

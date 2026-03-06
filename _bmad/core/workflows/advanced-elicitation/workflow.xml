@@ -20,7 +20,7 @@
 
   <flow>
     <step n="1" title="Method Registry Loading">
-      <action>Load and read {{methods}} and {{agent-party}}</action>
+      <action>Load and read {{methods}}. Then attempt to load {{agent-party}} — if the file does not exist, load from {project-root}/_bmad/bmm/teams/default-party.csv instead. If neither exists, skip agent-party loading and disable multi-persona techniques.</action>
 
       <csv-structure>
         <i>category: Method grouping (core, structural, risk, etc.)</i>
@@ -70,7 +70,7 @@
           <i>CRITICAL: Re-present the same 1-5,r,x prompt to allow additional elicitations</i>
         </case>
         <case n="r">
-          <i>Select 5 random methods from advanced-elicitation-methods.csv, present new list with same prompt format</i>
+          <i>Select 5 random methods from methods.csv, present new list with same prompt format</i>
           <i>When selecting, try to think and pick a diverse set of methods covering different categories and approaches, with 1 and 2 being
             potentially the most useful for the document or section being discovered</i>
         </case>

@@ -17,7 +17,7 @@ Read ALL available data sources. For each, note if present or absent:
 
 2. **Sprint Status** (`_bmad-output/implementation-artifacts/sprint-status.yaml`)
    - Current sprint number and dates
-   - Story statuses: ready-for-dev, in-progress, complete, blocked
+   - Story statuses: backlog, ready-for-dev, in-progress, review, done
    - Calculate velocity if multiple sprints exist
 
 3. **Repository Setup** (`docs/project/repository-setup.md`)

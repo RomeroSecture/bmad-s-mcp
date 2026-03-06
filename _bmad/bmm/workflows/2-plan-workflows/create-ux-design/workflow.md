@@ -38,7 +38,7 @@ When the user has indicated a pre-existing design exists (Figma, screenshots, st
 - **Steps 6, 8**: EXTRACT — read the design system and visual foundation from the existing design (via Figma MCP, screenshots, or style guide), document as established facts, do NOT propose alternatives.
 - **All other steps**: Execute normally, but in validation/audit mode rather than creation mode.
 
-This ensures Sally never contradicts or overrides an existing design's decisions.
+This ensures Marge never contradicts or overrides an existing design's decisions.
 
 ---
 

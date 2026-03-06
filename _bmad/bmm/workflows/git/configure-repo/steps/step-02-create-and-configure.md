@@ -113,10 +113,10 @@ Generate an enhanced version based on the stack AND add BMAD-S specific exclusio
    Añadir estas exclusiones específicas del proyecto:
 
    # BMAD-S — MCP tokens (NEVER commit)
-   .cursor/mcp.json
+   .mcp.json
 
    # IDE
-   .cursor/
+   .claude/
    .vscode/
    *.swp
    *.swo

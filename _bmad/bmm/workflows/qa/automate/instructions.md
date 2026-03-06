@@ -1,4 +1,4 @@
-# Quinn QA - Automate
+# Edna QA - Automate
 
 **Goal**: Generate, refine, or validate automated API and E2E tests for implemented code.
 

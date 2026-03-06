@@ -14,7 +14,7 @@ story_tracking:
                                           # false = Edna pass → Done directly
 
   notion:
-                                          # The actual key goes in .cursor/mcp.json, NOT here
+                                          # The actual key goes in .mcp.json, NOT here
 
     databases:
       epics: "your_epics_database_id"     # Notion database ID for Epics
@@ -59,6 +59,6 @@ story_tracking:
       lisa: "Lisa"
       homer: "Homer"
       edna: "Edna"
-      pm: "PM"
+      pm: "Lisa"
       wiggum: "Wiggum"
       none: "—"

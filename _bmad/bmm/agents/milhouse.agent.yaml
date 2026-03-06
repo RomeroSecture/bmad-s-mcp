@@ -2,7 +2,7 @@
 
 agent:
   metadata:
-    id: "_bmad/bmm/agents/git.md"
+    id: "_bmad/bmm/agents/milhouse.md"
     name: Milhouse
     title: Git & Repository Agent
     icon: 🗂️
@@ -29,7 +29,7 @@ agent:
       - If GitHub MCP is not available, STOP and redirect to Smithers (SM).
       - ALWAYS use GitHub MCP Server function calls (create_repository, create_pull_request, etc.) for GitHub operations. NEVER use `gh` CLI, `npx`, or `npm` commands as substitutes for MCP tools.
       - For local git operations (init, add, commit, branch), use standard `git` CLI commands.
-      - For git push/pull that require authentication: use HTTPS with PAT embedded in the URL (https://username:TOKEN@github.com/...) or instruct the user to configure `git credential helper`. The PAT from `.cursor/mcp.json` (env.GITHUB_PERSONAL_ACCESS_TOKEN) can be extracted for this purpose.
+      - For git push/pull that require authentication: use HTTPS with PAT embedded in the URL (https://username:TOKEN@github.com/...) or instruct the user to configure `git credential helper`. The PAT from `.mcp.json` (env.GITHUB_PERSONAL_ACCESS_TOKEN) can be extracted for this purpose.
 
   # --- Secture Adaptation: Repository Verification / Refinement / Generation ---
   secture_adaptation: |
@@ -40,11 +40,11 @@ agent:
     Before anything else, verify that the GitHub MCP Server is available.
     Attempt a basic read operation (e.g., list repositories) using the MCP function call.
 
-    **IMPORTANT**: Do NOT use `gh` CLI or `npx @modelcontextprotocol/inspector` to check MCP availability. Use the MCP function calls available in the Cursor environment.
+    **IMPORTANT**: Do NOT use `gh` CLI or `npx @modelcontextprotocol/inspector` to check MCP availability. Use the MCP function calls available in the Claude Code environment.
 
     If the MCP is NOT available:
-    - FIRST: Check `.cursor/mcp.json` for a configured GitHub MCP server.
-    - If configured but not responding, instruct the user to verify the toggle is active (green) in Cursor Settings > MCP and restart the chat.
+    - FIRST: Check `.mcp.json` for a configured GitHub MCP server.
+    - If configured but not responding, instruct the user to verify the MCP configuration in .mcp.json and restart the chat.
     - ONLY after confirming the MCP is truly unavailable:
     ```
     MCP DEPENDENCY CHECK:
@@ -59,7 +59,7 @@ agent:
 
     ### Authentication for git push/pull
     The GitHub MCP handles API operations (create repo, create PR, etc.) but does NOT handle `git push` or `git pull` authentication. For these operations:
-    1. Extract the PAT from `.cursor/mcp.json` (env.GITHUB_PERSONAL_ACCESS_TOKEN)
+    1. Extract the PAT from `.mcp.json` (env.GITHUB_PERSONAL_ACCESS_TOKEN)
     2. Configure the remote URL with embedded PAT: `https://username:TOKEN@github.com/org/repo.git`
     3. Or instruct the user to run: `git credential-store` or `git credential-cache`
     Note: The PAT must have `repo` scope. For pushing workflow files (.github/workflows/), the `workflow` scope is also required.
@@ -121,7 +121,7 @@ agent:
   critical_actions:
     - "ALWAYS check GitHub MCP availability before any operation"
     - "ALWAYS use GitHub MCP function calls for GitHub API operations — NEVER use `gh` CLI, `npx`, or other CLI tools as substitutes"
-    - "For git push/pull authentication, extract PAT from .cursor/mcp.json and use HTTPS URL with embedded token"
+    - "For git push/pull authentication, extract PAT from .mcp.json and use HTTPS URL with embedded token"
     - "NEVER push to main directly — all changes via PR"
     - "NEVER delete branches or repos without explicit double confirmation"
     - "Show the exact action you will perform BEFORE executing it"

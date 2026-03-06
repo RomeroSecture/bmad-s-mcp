@@ -1,4 +1,4 @@
-# Quinn QA workflow: Automate
+# Edna QA workflow: Automate
 name: qa-automate
 description: "Generate tests quickly for existing features using standard test patterns"
 author: "BMad"

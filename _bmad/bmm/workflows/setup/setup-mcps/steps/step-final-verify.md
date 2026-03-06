@@ -11,11 +11,11 @@ Run a complete verification of all configured MCPs:
 ║                                                  ║
 ║  Project: {project_name}                         ║
 ║  User: {user_name}                               ║
-║  IDE: Cursor                                     ║
+║  IDE: Claude Code                                     ║
 ║                                                  ║
 ║  CORE CONFIGURATION                              ║
 ║  ├── config.yaml:     [✅ | ❌]                  ║
-║  ├── bmad.mdc:        [✅ | ❌]                  ║
+║  ├── CLAUDE.md:        [✅ | ❌]                  ║
 ║  └── .gitignore:      [✅ | ❌] (mcp.json)      ║
 ║                                                  ║
 ║  MCP SERVERS                                     ║
@@ -46,14 +46,14 @@ List all files created or modified during this setup:
 
 ```
 FILES GENERATED/MODIFIED:
-- .cursor/mcp.json          [CREATED | UPDATED]
+- .mcp.json          [CREATED | UPDATED]
 - .gitignore                [UPDATED — added mcp.json exclusion]
 ```
 
 ## Security Reminders
 
 > ⚠️ **Recordatorios de seguridad:**
-> - NUNCA subas `.cursor/mcp.json` al repositorio — contiene tokens
+> - NUNCA subas `.mcp.json` al repositorio — contiene tokens
 > - Los tokens de GitHub expiran en <X días> — renuévalos antes
 > - Las credenciales AWS deben rotarse según la política de tu empresa
 > - Si un token se compromete, revócalo inmediatamente en la consola correspondiente
@@ -64,7 +64,7 @@ Based on what was configured, suggest next actions:
 
 > **Tu entorno está listo. Próximos pasos recomendados:**
 >
-> 1. **Abre una conversación nueva en Cursor** (las rules y MCPs se cargan al inicio)
+> 1. **Abre una nueva sesión de Claude Code** (las rules y MCPs se cargan al inicio)
 > 2. Activa el primer agente que necesites:
 >    - Para planificación: "Lisa, CP" (crear PRD)
 >    - Para repositorio: "Milhouse, CR" (configurar repo)

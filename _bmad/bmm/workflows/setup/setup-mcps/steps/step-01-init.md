@@ -4,7 +4,7 @@
 
 **STOP. Before scanning files or generating anything, execute the Secture Adaptation protocol.**
 
-1. Check if `.cursor/mcp.json` exists in the project root
+1. Check if `.mcp.json` exists in the project root
 2. Check if any MCP servers are already referenced
 3. Emit the **ENVIRONMENT INVENTORY** block from your `secture_adaptation`
 4. Declare **EXECUTION MODE** (VERIFY / REFINE / GENERATE)

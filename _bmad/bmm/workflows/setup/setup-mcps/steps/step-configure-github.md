@@ -9,7 +9,7 @@ Before starting, verify:
 If Docker is NOT installed:
 > Para usar el GitHub MCP Server necesitas Docker instalado. 
 > Descárgalo de https://www.docker.com/products/docker-desktop/
-> Una vez instalado, reinicia Cursor y vuelve a ejecutar este workflow.
+> Una vez instalado, inicia una nueva sesión de Claude Code y vuelve a ejecutar este workflow.
 > **[HALT]** — Cannot proceed without Docker.
 
 ---
@@ -46,7 +46,7 @@ Guide the user step by step:
 **Wait for user to provide the token.**
 
 ⚠️ **IMPORTANT:** Do NOT store the token in any file that could be committed to git. 
-It will ONLY go in `.cursor/mcp.json` which should be in `.gitignore`.
+It will ONLY go in `.mcp.json` which should be in `.gitignore`.
 
 ---
 
@@ -73,10 +73,10 @@ Once the token is provided, generate the MCP configuration block:
 ```
 
 Actions:
-1. Check if `.cursor/mcp.json` already exists
+1. Check if `.mcp.json` already exists
 2. If YES: merge the `github` entry into existing configuration
 3. If NO: create the file with the github configuration
-4. Verify `.gitignore` includes `.cursor/mcp.json` — if not, add it
+4. Verify `.gitignore` includes `.mcp.json` — if not, add it
 
 Show the user the generated file and ask for confirmation before writing.
 
@@ -84,7 +84,7 @@ Show the user the generated file and ask for confirmation before writing.
 
 ## Part C: Verify Connectivity
 
-> Reinicia Cursor (cierra y abre la aplicación) para que cargue la nueva configuración MCP.
+> Inicia una nueva sesión de Claude Code para que cargue la nueva configuración MCP.
 > Cuando hayas reiniciado, dime [C] y verificaré que el GitHub MCP responde.
 
 After user confirms restart:

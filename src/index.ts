@@ -14,6 +14,7 @@ async function main(): Promise<void> {
 }
 
 main().catch((error) => {
-  console.error('[bmad-mcp] Fatal error:', error);
+  // Use console.error directly — logger may not be initialized yet
+  console.error('[bmad-mcp] [emergency] Fatal error:', error);
   process.exit(1);
 });

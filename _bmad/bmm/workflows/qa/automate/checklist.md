@@ -1,4 +1,4 @@
-# Quinn Automate - Validation Checklist
+# Edna Automate - Validation Checklist
 
 ## Test Generation
 

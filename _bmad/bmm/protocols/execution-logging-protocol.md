@@ -207,7 +207,7 @@ Severity levels:
       - step: "step-0-mcp-check"
         action: "Verify GitHub MCP availability"
         error: "GitHub MCP Server not available"
-        context: "No MCP configuration found in .cursor/mcp.json for GitHub"
+        context: "No MCP configuration found in .mcp.json for GitHub"
         recovery: "Run 'Smithers, SM' to configure GitHub MCP"
         severity: "blocking"
     next_recommended: "Smithers, SM — configure GitHub MCP"

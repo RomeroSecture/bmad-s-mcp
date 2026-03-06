@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  validate-workflow.xml — Workflow Validation Task
+  Invoked by handler-validate-workflow when an agent menu entry
+  contains validate-workflow="path/to/workflow.yaml"
+-->
+
+<task id="validate-workflow">
+  <metadata>
+    <name>Validate Workflow</name>
+    <description>Validates a workflow YAML against its declared validation schema and checks structural integrity.</description>
+    <version>1.0.0-placeholder</version>
+  </metadata>
+
+  <instructions>
+    You are validating a workflow YAML file for structural correctness and completeness.
+
+    ## Step 1: Identify the workflow file
+
+    If a workflow path was passed via the validate-workflow attribute, load that file.
+    If no path was provided, ask the user to specify the workflow YAML to validate.
+
+    ## Step 2: Read and parse the workflow
+
+    Load the workflow YAML. Extract these fields:
+    - name (required)
+    - description (required)
+    - config_source (required — path to config.yaml)
+    - instructions OR steps_path (at least one required)
+    - validation (optional — path to a validation schema/checklist)
+
+    ## Step 3: Load validation schema (if declared)
+
+    Check the workflow YAML for a `validation` property. If present:
+    - Load the file at that path
+    - Use it as the checklist for detailed validation in Step 4
+
+    If no validation property is declared, use only the structural checks in Step 4.
+
+    ## Step 4: Validate
+
+    ### Structural checks (always run):
+    - [ ] `name` field exists and is non-empty
+    - [ ] `description` field exists and is non-empty
+    - [ ] `config_source` field exists and points to a file that exists
+    - [ ] Either `instructions` (inline) or `steps_path` (directory) is defined
+    - [ ] If `steps_path` is defined, the directory exists and contains at least one step file
+    - [ ] If `validation` is defined, the referenced file exists
+    - [ ] All other file paths referenced in the YAML resolve to existing files
+
+    ### Schema checks (only if validation schema was loaded):
+    - Run each item in the validation checklist against the workflow
+    - Mark each as PASS or FAIL with a brief reason
+
+    ## Step 5: Report
+
+    Output a validation report in this format:
+
+    ```
+    WORKFLOW VALIDATION REPORT
+    ══════════════════════════
+    File: {path to workflow}
+    Name: {workflow name}
+
+    Structural Checks:
+      ✓ name: present
+      ✓ description: present
+      ✗ steps_path: directory not found at {path}
+      ...
+
+    Schema Checks: {N/A if no schema, or list results}
+      ✓ {check description}
+      ✗ {check description} — {reason}
+
+    Result: PASS | FAIL ({N} issues found)
+    ```
+
+    If ALL checks pass → Result: PASS
+    If ANY check fails → Result: FAIL with count of failures
+  </instructions>
+</task>

@@ -38,7 +38,7 @@ EXISTING INFRASTRUCTURE:
 BMAD-S STRUCTURE:
 - _bmad/ folder: [PRESENT | ABSENT]
 - _bmad-output/ folder: [PRESENT | ABSENT]
-- .cursor/rules/bmad.mdc: [PRESENT | ABSENT]
+- CLAUDE.md: [PRESENT | ABSENT]
 - config.yaml personalized: [YES | NO | ABSENT]
 
 OBSERVATIONS:

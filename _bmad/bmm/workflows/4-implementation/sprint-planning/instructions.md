@@ -22,6 +22,10 @@
 
 <workflow>
 
+<step n="0.5" goal="Discover and load project documents">
+    <invoke-protocol name="discover_inputs" />
+    <note>After discovery, these content variables are available: {epics_content} (all epics loaded - uses FULL_LOAD strategy)</note>
+</step>
 <step n="1" goal="Parse epic files and extract all work items">
 <action>Communicate in {communication_language} with {user_name}</action>
 <action>Look for all files matching `{epics_pattern}` in {epics_location}</action>
@@ -43,10 +47,6 @@
 <action>Build complete inventory of all epics and stories from all epic files</action>
 </step>
 
-  <step n="0.5" goal="Discover and load project documents">
-    <invoke-protocol name="discover_inputs" />
-    <note>After discovery, these content variables are available: {epics_content} (all epics loaded - uses FULL_LOAD strategy)</note>
-  </step>
 
 <step n="2" goal="Build sprint status structure">
 <action>For each epic found, create entries in this order:</action>

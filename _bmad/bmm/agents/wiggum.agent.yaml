@@ -2,7 +2,7 @@
 
 agent:
   metadata:
-    id: "_bmad/bmm/agents/deploy.md"
+    id: "_bmad/bmm/agents/wiggum.md"
     name: Wiggum
     title: Deploy & CI/CD Agent
     icon: 🚀
@@ -54,7 +54,7 @@ agent:
     ### If the MCP does NOT respond, follow this MANDATORY sequence:
 
     **Step 0a — Check mcp.json:**
-    Read `.cursor/mcp.json`. Is the MCP configured there?
+    Read `.mcp.json`. Is the MCP configured there?
     - If NOT configured → declare absent, suggest "Smithers, SM"
     - If YES configured → proceed to Step 0b
 
@@ -62,15 +62,14 @@ agent:
     Print this EXACT message and WAIT for user response:
     ```
     ⚠️ MCP TOGGLE CHECK REQUIRED:
-    El MCP de <Platform> está configurado en .cursor/mcp.json pero no responde.
-    Esto suele ocurrir porque el toggle se desactiva en chats nuevos de Cursor.
+    El MCP de <Platform> está configurado en .mcp.json pero no responde.
+    Esto suele ocurrir cuando el MCP no está cargado en la sesión actual de Claude Code.
 
     Por favor, verifica:
-    1. Abre Cursor Settings > MCP
-    2. Comprueba que el toggle de <Platform> esté VERDE (activo)
-    3. Si estaba apagado, actívalo y abre un nuevo chat
+    1. Revisa que el MCP de <Platform> esté configurado en .mcp.json
+    2. Inicia una nueva sesión de Claude Code para recargar los MCPs
 
-    ¿El toggle está verde? [S] Sí / [N] No
+    ¿El MCP responde? [S] Sí / [N] No
     ```
     **HALT here. Do NOT proceed until the user responds.**
 
@@ -78,7 +77,7 @@ agent:
     - If user says [N] (toggle was off) → instruct user to activate it and open a new chat. End current workflow.
 
     **Step 0c — Extract credentials for CLI fallback:**
-    If MCP is truly unavailable but credentials exist in `.cursor/mcp.json` (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY), these can be reused for AWS CLI. Note this in the inventory.
+    If MCP is truly unavailable but credentials exist in `.mcp.json` (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY), these can be reused for AWS CLI. Note this in the inventory.
 
     ### MCP unavailable declaration (only after Step 0b):
     ```

@@ -8,20 +8,21 @@ Scan the project for the required BMAD-S structure and report:
 PROJECT STRUCTURE CHECK:
 
 RULES
-├── .cursor/rules/bmad.mdc:          [✅ | ❌ MISSING]
+├── CLAUDE.md:          [✅ | ❌ MISSING]
 
 AGENTS
-├── _bmad/bmm/agents/pm.agent.yaml:           [✅ | ❌] Lisa
-├── _bmad/bmm/agents/ux-designer.agent.yaml:  [✅ | ❌] Marge
-├── _bmad/bmm/agents/architect.agent.yaml:    [✅ | ❌] Frink
-├── _bmad/bmm/agents/dev.agent.yaml:          [✅ | ❌] Homer
-├── _bmad/bmm/agents/qa.agent.yaml:           [✅ | ❌] Edna
-├── _bmad/bmm/agents/sm.agent.yaml:           [✅ | ❌] Ned
-├── _bmad/bmm/agents/analyst.agent.yaml:      [✅ | ❌] Monty
-├── _bmad/bmm/agents/quick-flow-solo-dev.agent.yaml: [✅ | ❌] Bart
-├── _bmad/bmm/agents/tech-writer/:            [✅ | ❌] Kent
-├── _bmad/bmm/agents/setup.agent.yaml:        [✅ | ❌] Smithers
-└── _bmad/bmm/agents/git.agent.yaml:          [✅ | ❌] Milhouse
+├── _bmad/bmm/agents/lisa.agent.yaml:         [✅ | ❌] Lisa
+├── _bmad/bmm/agents/marge.agent.yaml:        [✅ | ❌] Marge
+├── _bmad/bmm/agents/frink.agent.yaml:        [✅ | ❌] Frink
+├── _bmad/bmm/agents/homer.agent.yaml:        [✅ | ❌] Homer
+├── _bmad/bmm/agents/edna.agent.yaml:         [✅ | ❌] Edna
+├── _bmad/bmm/agents/ned.agent.yaml:          [✅ | ❌] Ned
+├── _bmad/bmm/agents/monty.agent.yaml:        [✅ | ❌] Monty
+├── _bmad/bmm/agents/bart.agent.yaml:         [✅ | ❌] Bart
+├── _bmad/bmm/agents/wiggum.agent.yaml:       [✅ | ❌] Wiggum
+├── _bmad/bmm/agents/kent/:                   [✅ | ❌] Kent
+├── _bmad/bmm/agents/smithers.agent.yaml:     [✅ | ❌] Smithers
+└── _bmad/bmm/agents/milhouse.agent.yaml:     [✅ | ❌] Milhouse
 
 CONFIG
 ├── _bmad/bmm/config.yaml:           [✅ | ❌]
@@ -42,9 +43,9 @@ CORE ENGINE
 
 ---
 
-## Verify bmad.mdc Content
+## Verify CLAUDE.md Content
 
-Check that `bmad.mdc` contains:
+Check that `CLAUDE.md` contains:
 1. Agent registry — all agents listed with correct paths
 2. Trigger table — all triggers present and matching agent definitions
 3. VRG protocol — Secture Adaptation section exists
@@ -52,7 +53,7 @@ Check that `bmad.mdc` contains:
 If any issues found:
 
 ```
-⚠️ ISSUES IN bmad.mdc:
+⚠️ ISSUES IN CLAUDE.md:
 - <description of each issue>
 ```
 
@@ -85,7 +86,7 @@ STRUCTURE VERIFICATION:
 ├── Party CSV:        [✅ | ❌]
 ├── Output folders:   [✅ | PENDING]
 ├── Core engine:      [✅ | ❌]
-└── bmad.mdc valid:   [✅ | ❌]
+└── CLAUDE.md valid:   [✅ | ❌]
 ```
 
 Present menu:

@@ -92,13 +92,13 @@ function transformFrontmatterRefs(content: string, fileDir: string, workflowDir:
 
     if (STEP_KEYS.includes(key)) {
       const stepInfo = parseStepPath(resolvedPath);
-      return `${key}: '${value}' # → bmad_get_step(${JSON.stringify(stepInfo)})`;
+      return `${key}: '${value}' # → bmad_get_step(${ singleQuoteArgs(stepInfo as unknown as Record<string, string>) })`;
     }
     if (TEMPLATE_KEYS.includes(key)) {
-      return `${key}: '${value}' # → bmad_get_template({ "template_path": "${resolvedPath}" })`;
+      return `${key}: '${value}' # → bmad_get_template(${ singleQuoteArgs({ template_path: resolvedPath }) })`;
     }
     if (WORKFLOW_KEYS.includes(key)) {
-      return `${key}: '${value}' # → bmad_get_workflow({ "workflow_path": "${resolvedPath}" })`;
+      return `${key}: '${value}' # → bmad_get_workflow(${ singleQuoteArgs({ workflow_path: resolvedPath }) })`;
     }
     return match;
   });
@@ -152,7 +152,7 @@ function transformManifestRefs(content: string): string {
   // agent-manifest.csv → bmad_list_agents
   content = content.replace(
     /\{project-root\}\/_bmad\/_config\/agent-manifest\.csv/g,
-    'bmad_list_agents({ "module": "all" })',
+    `bmad_list_agents(${ singleQuoteArgs({ module: 'all' }) })`,
   );
   // workflow-manifest.csv → bmad_list_workflows
   content = content.replace(
@@ -294,7 +294,20 @@ function parseStepPath(fullPath: string): { workflow_path: string; step_file: st
 }
 
 /**
+ * Serializes key-value args using single quotes.
+ * Single quotes are safe inside YAML double-quoted strings, unlike double quotes
+ * which produce invalid YAML when nested (the original bug).
+ */
+function singleQuoteArgs(args: Record<string, string>): string {
+  const entries = Object.entries(args).map(([k, v]) => `'${k}': '${v}'`);
+  return `{ ${entries.join(', ')} }`;
+}
+
+/**
  * Builds an MCP tool call string from a content-relative path.
+ *
+ * Uses single quotes for JSON-like params so the resulting string is safe
+ * to embed inside YAML double-quoted values without breaking the parser.
  */
 function buildToolCall(bmadPath: string): string {
   const lower = bmadPath.toLowerCase();
@@ -302,7 +315,7 @@ function buildToolCall(bmadPath: string): string {
   // Agents
   if (lower.includes('/agents/') && lower.endsWith('.agent.yaml')) {
     const name = basename(bmadPath, '.agent.yaml');
-    return `bmad_get_agent({ "agent_id": "${name}" })`;
+    return `bmad_get_agent(${ singleQuoteArgs({ agent_id: name }) })`;
   }
 
   // Config
@@ -313,13 +326,13 @@ function buildToolCall(bmadPath: string): string {
   // Tasks
   if (lower.includes('/tasks/')) {
     const name = basename(bmadPath).replace(/\.(xml|md|yaml)$/, '');
-    return `bmad_get_task({ "task_name": "${name}" })`;
+    return `bmad_get_task(${ singleQuoteArgs({ task_name: name }) })`;
   }
 
   // Protocols
   if (lower.includes('/protocols/')) {
     const name = basename(bmadPath).replace(/\.(md|xml|yaml)$/, '');
-    return `bmad_get_protocol({ "protocol_name": "${name}" })`;
+    return `bmad_get_protocol(${ singleQuoteArgs({ protocol_name: name }) })`;
   }
 
   // Steps (files inside steps/ or steps-X/ directories)
@@ -330,27 +343,27 @@ function buildToolCall(bmadPath: string): string {
       step_file: info.step_file,
     };
     if (info.steps_dir) args.steps_dir = info.steps_dir;
-    return `bmad_get_step(${JSON.stringify(args)})`;
+    return `bmad_get_step(${ singleQuoteArgs(args) })`;
   }
 
   // Templates
   if (lower.includes('/templates/')) {
-    return `bmad_get_template({ "template_path": "${bmadPath}" })`;
+    return `bmad_get_template(${ singleQuoteArgs({ template_path: bmadPath }) })`;
   }
 
   // Workflow files
   if (lower.includes('/workflows/') && /workflow[\.\-]/.test(lower)) {
-    return `bmad_get_workflow({ "workflow_path": "${bmadPath}" })`;
+    return `bmad_get_workflow(${ singleQuoteArgs({ workflow_path: bmadPath }) })`;
+  }
+
+  // module-help.csv specifically (must be before generic .csv catch-all)
+  if (lower.includes('module-help')) {
+    return `bmad_list_workflows({})`;
   }
 
   // CSV/data files
   if (lower.endsWith('.csv')) {
-    return `bmad_get_data({ "data_path": "${bmadPath}" })`;
-  }
-
-  // module-help.csv specifically
-  if (lower.includes('module-help')) {
-    return `bmad_list_workflows({})`;
+    return `bmad_get_data(${ singleQuoteArgs({ data_path: bmadPath }) })`;
   }
 
   // Fallback: generic data file
@@ -358,10 +371,10 @@ function buildToolCall(bmadPath: string): string {
   if (['.md', '.yaml', '.xml', '.txt', '.json'].includes(ext)) {
     // Try to classify by path
     if (lower.includes('/workflows/')) {
-      return `bmad_get_workflow({ "workflow_path": "${bmadPath}" })`;
+      return `bmad_get_workflow(${ singleQuoteArgs({ workflow_path: bmadPath }) })`;
     }
-    return `bmad_get_data({ "data_path": "${bmadPath}" })`;
+    return `bmad_get_data(${ singleQuoteArgs({ data_path: bmadPath }) })`;
   }
 
-  return `bmad_get_data({ "data_path": "${bmadPath}" })`;
+  return `bmad_get_data(${ singleQuoteArgs({ data_path: bmadPath }) })`;
 }

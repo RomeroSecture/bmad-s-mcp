@@ -2,7 +2,7 @@
 
 agent:
   metadata:
-    id: "_bmad/bmm/agents/architect.md"
+    id: "_bmad/bmm/agents/frink.md"
     name: Frink
     title: Architect
     icon: 🏗️
@@ -111,6 +111,3 @@ agent:
       exec: "{project-root}/_bmad/bmm/workflows/3-solutioning/create-architecture/workflow.md"
       description: "[CA] Create Architecture: Guided Workflow to document technical decisions to keep implementation on track"
 
-    - trigger: IR or fuzzy match on implementation-readiness
-      exec: "{project-root}/_bmad/bmm/workflows/3-solutioning/check-implementation-readiness/workflow.md"
-      description: "[IR] Implementation Readiness: Ensure the PRD, UX, and Architecture and Epics and Stories List are all aligned"

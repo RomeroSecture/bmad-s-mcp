@@ -64,5 +64,5 @@ Generate the final onboarding summary:
 ╚══════════════════════════════════════════════════╝
 ```
 
-> **Abre una conversación nueva en Cursor** para que las rules y la config
+> **Abre una nueva sesión de Claude Code** para que las rules y la config
 > se carguen desde el inicio. Luego activa el primer agente que necesites.

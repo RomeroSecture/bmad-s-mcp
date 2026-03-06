@@ -1,5 +1,5 @@
 name: setup-project
-description: "Full project onboarding — personalize config.yaml, verify bmad.mdc, configure MCPs, and validate environment"
+description: "Full project onboarding — personalize config.yaml, verify CLAUDE.md, configure MCPs, and validate environment"
 author: "BMad"
 
 # Critical variables from config
@@ -15,5 +15,5 @@ steps_path: "{installed_path}/steps"
 
 # This workflow orchestrates three phases:
 # Phase 1: Personalize config.yaml (steps/step-01-config.md)
-# Phase 2: Verify project structure and bmad.mdc (steps/step-02-verify-structure.md)
+# Phase 2: Verify project structure and CLAUDE.md (steps/step-02-verify-structure.md)
 # Phase 3: Hand off to setup-mcps workflow if user needs MCPs (steps/step-03-mcps-handoff.md)
