@@ -6,7 +6,7 @@ import { ContentReader } from '../content/reader.js';
 export const GetStepInputSchema = z.object({
   workflow_path: z.string().describe('Path to the workflow directory or workflow file'),
   step_file: z.string().describe('Step filename (e.g., "step-01.md", "step-02.md")'),
-  steps_dir: z.string().optional().default('steps').describe('Steps subdirectory name (default: "steps")'),
+  steps_dir: z.string().optional().describe('Steps subdirectory name (e.g., "steps-c", "steps-v", "steps-e"). Required for most workflows — check the nextStepFile YAML comment for the correct value.'),
 });
 
 export type GetStepInput = z.infer<typeof GetStepInputSchema>;
@@ -16,17 +16,19 @@ export function getStep(
   reader: ContentReader,
   input: GetStepInput,
 ): string | null {
-  // Normalize workflow path - if it's a file, get its directory
+  // Normalize workflow path - if it points to a workflow file, get its directory
   let workflowDir = input.workflow_path;
-  if (workflowDir.includes('workflow.') || workflowDir.includes('workflow-')) {
+  const lastSegment = workflowDir.split('/').pop() || '';
+  if (lastSegment.startsWith('workflow.') || lastSegment.startsWith('workflow-')) {
     workflowDir = dirname(workflowDir);
   }
 
   // Clean path prefix
   workflowDir = workflowDir.replace(/^_bmad\//, '');
 
-  // Build the step path
-  const stepPath = `${workflowDir}/${input.steps_dir}/${input.step_file}`;
+  // Build the step path (fallback to 'steps' if not provided)
+  const stepsDir = input.steps_dir ?? 'steps';
+  const stepPath = `${workflowDir}/${stepsDir}/${input.step_file}`;
   const entry = registry.findByPath(stepPath);
 
   if (!entry) {

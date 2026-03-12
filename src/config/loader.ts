@@ -49,7 +49,7 @@ export function loadConfig(projectRoot?: string): BmadConfig {
     implementation_artifacts: localConfig.implementation_artifacts || undefined,
     project_knowledge: localConfig.project_knowledge || undefined,
     transport: process.env.BMAD_TRANSPORT || undefined,
-    http_port: process.env.BMAD_HTTP_PORT ? parseInt(process.env.BMAD_HTTP_PORT, 10) : undefined,
+    http_port: process.env.BMAD_HTTP_PORT ? (Number.isNaN(Number(process.env.BMAD_HTTP_PORT)) ? undefined : parseInt(process.env.BMAD_HTTP_PORT, 10)) : undefined,
   };
 
   // Remove undefined values so Zod defaults kick in

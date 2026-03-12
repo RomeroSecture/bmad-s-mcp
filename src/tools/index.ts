@@ -1,5 +1,6 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { ContentRegistry } from '../content/registry.js';
+import type { ProjectReader } from '../project/project-reader.js';
 import { ContentReader } from '../content/reader.js';
 import { ListAgentsInputSchema, listAgents } from './list-agents.js';
 import { GetAgentInputSchema, getAgent } from './get-agent.js';
@@ -18,8 +19,17 @@ import { GetChecklistInputSchema, getChecklist } from './get-checklist.js';
 import { SearchContentInputSchema, searchContent } from './search-content.js';
 import { ListDocsInputSchema, listDocs } from './list-docs.js';
 import { GetDocInputSchema, getDoc } from './get-doc.js';
+import { GetExecutionLogInputSchema, getExecutionLog } from './get-execution-log.js';
+import { WriteExecutionEntryInputSchema, writeExecutionEntry } from './write-execution-entry.js';
+import { GetProjectStatusInputSchema, getProjectStatus } from './get-project-status.js';
+import { GetSprintStatusInputSchema, getSprintStatus } from './get-sprint-status.js';
+import { ListStoriesInputSchema, listStories } from './list-stories.js';
+import { GetStoryInputSchema, getStory } from './get-story.js';
+import { GetArtifactInventoryInputSchema, getArtifactInventory } from './get-artifact-inventory.js';
+import { ListElicitationMethodsInputSchema, listElicitationMethods } from './list-elicitation-methods.js';
+import { RecoverExecutionInputSchema, recoverExecution } from './recover-execution.js';
 
-/** All BMAD tools are read-only: they serve content but never modify anything */
+/** All BMAD content tools are read-only: they serve content but never modify anything */
 const READ_ONLY = {
   readOnlyHint: true,
   destructiveHint: false,
@@ -27,7 +37,15 @@ const READ_ONLY = {
   openWorldHint: false,
 } as const;
 
-export function registerTools(server: McpServer, registry: ContentRegistry): void {
+/** Write-append annotation for ELP write tool */
+const WRITE_APPEND = {
+  readOnlyHint: false,
+  destructiveHint: false,
+  idempotentHint: false,
+  openWorldHint: false,
+} as const;
+
+export function registerTools(server: McpServer, registry: ContentRegistry, projectReader?: ProjectReader): void {
   const reader = new ContentReader(registry);
 
   // === Phase 1: MVP Tools ===
@@ -111,7 +129,7 @@ export function registerTools(server: McpServer, registry: ContentRegistry): voi
     'bmad_get_step',
     {
       title: 'Get Workflow Step',
-      description: 'Get the content of a specific step file from a BMAD workflow',
+      description: "Get a specific step file from a BMAD workflow. IMPORTANT: Always include steps_dir (e.g., 'steps-c', 'steps-v') — the default 'steps' rarely exists. Use the exact parameters from the previous step's nextStepFile YAML comment.",
       inputSchema: GetStepInputSchema.shape,
       annotations: READ_ONLY,
     },
@@ -119,7 +137,7 @@ export function registerTools(server: McpServer, registry: ContentRegistry): voi
       const result = getStep(registry, reader, input);
       if (!result) {
         return {
-          content: [{ type: 'text' as const, text: `Step not found: ${input.step_file} in ${input.workflow_path}/${input.steps_dir}. Not all workflows use step files — some use instructions.xml/instructions.md instead. Use bmad_get_workflow with the workflow_path to read the full workflow content.` }],
+          content: [{ type: 'text' as const, text: `Step not found: ${input.step_file} in ${input.workflow_path}/${input.steps_dir ?? 'steps'}.\nCommon causes: (1) Wrong step filename — use the EXACT name from the previous step's nextStepFile frontmatter, do NOT guess names. (2) Wrong steps_dir — most workflows use steps-c, steps-v, or steps-e, NOT the default 'steps'. (3) If unsure, call bmad_get_workflow with the workflow_path to see available step files.` }],
           isError: true,
         };
       }
@@ -324,6 +342,145 @@ export function registerTools(server: McpServer, registry: ContentRegistry): voi
           isError: true,
         };
       }
+      return { content: [{ type: 'text' as const, text: result }] };
+    },
+  );
+
+  // === Project State Tools ===
+  // These tools work in two modes:
+  // 1. Filesystem (stdio): ProjectReader reads/writes directly
+  // 2. Content-passthrough (HTTP): LLM reads files locally, passes content to tool, tool processes and returns result
+
+  const pr = projectReader ?? null;
+
+  server.registerTool(
+    'bmad_get_execution_log',
+    {
+      title: 'Get Execution Log',
+      description: 'Read the execution log (ELP) — workflow execution history, orphan detection, error filtering. In HTTP mode, pass execution_log_content with the raw YAML of _bmad-output/execution-log.yaml.',
+      inputSchema: GetExecutionLogInputSchema.shape,
+      annotations: READ_ONLY,
+    },
+    async (input) => {
+      const result = getExecutionLog(pr, input);
+      return { content: [{ type: 'text' as const, text: result }] };
+    },
+  );
+
+  server.registerTool(
+    'bmad_write_execution_entry',
+    {
+      title: 'Write Execution Entry',
+      description: 'Log a workflow execution entry to the ELP (start or close phase). In HTTP mode, pass execution_log_content and the tool returns updated YAML to write back.',
+      inputSchema: WriteExecutionEntryInputSchema.shape,
+      annotations: WRITE_APPEND,
+    },
+    async (input) => {
+      const result = writeExecutionEntry(pr, input);
+      return { content: [{ type: 'text' as const, text: result }] };
+    },
+  );
+
+  server.registerTool(
+    'bmad_get_project_status',
+    {
+      title: 'Project Status',
+      description: 'Get full project status dashboard: artifacts, executions, sprint status, orphan detection. In HTTP mode, pass execution_log_content, planning_files, implementation_files, sprint_status_content, stories_data.',
+      inputSchema: GetProjectStatusInputSchema.shape,
+      annotations: READ_ONLY,
+    },
+    async (input) => {
+      const result = getProjectStatus(pr, input);
+      return { content: [{ type: 'text' as const, text: result }] };
+    },
+  );
+
+  server.registerTool(
+    'bmad_get_sprint_status',
+    {
+      title: 'Sprint Status',
+      description: 'Get current sprint status file content. In HTTP mode, pass content with the raw YAML of sprint-status.yaml.',
+      inputSchema: GetSprintStatusInputSchema.shape,
+      annotations: READ_ONLY,
+    },
+    async (input) => {
+      const result = getSprintStatus(pr, input);
+      if (!result) {
+        return { content: [{ type: 'text' as const, text: 'No sprint status file found in implementation artifacts directory' }], isError: true };
+      }
+      return { content: [{ type: 'text' as const, text: result }] };
+    },
+  );
+
+  server.registerTool(
+    'bmad_list_stories',
+    {
+      title: 'List Stories',
+      description: 'List implementation stories with optional filtering by status or epic. In HTTP mode, pass stories_data with an array of {filename, status?, epic?}.',
+      inputSchema: ListStoriesInputSchema.shape,
+      annotations: READ_ONLY,
+    },
+    async (input) => {
+      const result = listStories(pr, input);
+      return { content: [{ type: 'text' as const, text: result }] };
+    },
+  );
+
+  server.registerTool(
+    'bmad_get_story',
+    {
+      title: 'Get Story',
+      description: 'Get full content of an implementation story by ID or filename. In HTTP mode, pass content with the raw story file content.',
+      inputSchema: GetStoryInputSchema.shape,
+      annotations: READ_ONLY,
+    },
+    async (input) => {
+      const result = getStory(pr, input);
+      if (!result) {
+        return { content: [{ type: 'text' as const, text: `Story not found: ${input.story_id}` }], isError: true };
+      }
+      return { content: [{ type: 'text' as const, text: result }] };
+    },
+  );
+
+  server.registerTool(
+    'bmad_get_artifact_inventory',
+    {
+      title: 'Artifact Inventory',
+      description: 'Scan existing project artifacts for VRG protocol — reports coverage and recommends VERIFY/REFINE/GENERATE mode. In HTTP mode, pass planning_files, implementation_files, project_doc_files with file paths.',
+      inputSchema: GetArtifactInventoryInputSchema.shape,
+      annotations: READ_ONLY,
+    },
+    async (input) => {
+      const result = getArtifactInventory(pr, input);
+      return { content: [{ type: 'text' as const, text: result }] };
+    },
+  );
+
+  server.registerTool(
+    'bmad_list_elicitation_methods',
+    {
+      title: 'List Elicitation Methods',
+      description: 'List the 50 advanced elicitation techniques available for deep-dive analysis, optionally filtered by category',
+      inputSchema: ListElicitationMethodsInputSchema.shape,
+      annotations: READ_ONLY,
+    },
+    async (input) => {
+      const result = listElicitationMethods(registry, reader, input);
+      return { content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }] };
+    },
+  );
+
+  server.registerTool(
+    'bmad_recover_execution',
+    {
+      title: 'Recover Execution',
+      description: 'Error recovery (FX): diagnose orphan/failed executions and resolve them. In HTTP mode, pass execution_log_content with the raw YAML.',
+      inputSchema: RecoverExecutionInputSchema.shape,
+      annotations: WRITE_APPEND,
+    },
+    async (input) => {
+      const result = recoverExecution(pr, input);
       return { content: [{ type: 'text' as const, text: result }] };
     },
   );

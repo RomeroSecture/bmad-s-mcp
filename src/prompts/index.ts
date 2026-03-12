@@ -2,11 +2,13 @@ import { z } from 'zod';
 import { completable } from '@modelcontextprotocol/sdk/server/completable.js';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { ContentRegistry } from '../content/registry.js';
+import type { ProjectReader } from '../project/project-reader.js';
 import { ContentReader } from '../content/reader.js';
 import { listAgents } from '../tools/list-agents.js';
 import { listWorkflows } from '../tools/list-workflows.js';
+import { listElicitationMethods } from '../tools/list-elicitation-methods.js';
 
-export function registerPrompts(server: McpServer, registry: ContentRegistry): void {
+export function registerPrompts(server: McpServer, registry: ContentRegistry, _projectReader?: ProjectReader): void {
   const reader = new ContentReader(registry);
 
   // Cache agent/workflow lists for completions (rebuilt on each completion call)
@@ -142,6 +144,77 @@ export function registerPrompts(server: McpServer, registry: ContentRegistry): v
             text: topic
               ? `Explain the "${topic}" concept from the BMAD-S methodology. Use bmad_get_doc with topic "${topic}" to find relevant documentation, then summarize it for me.`
               : 'Give me an overview of the BMAD-S methodology. Use bmad_get_doc to find the overview documentation and present the key concepts: agents, VRG protocol, workflows, and the typical project flow.',
+          },
+        },
+      ],
+    }),
+  );
+
+  // --- bmad-diagnose: Project diagnosis ---
+  server.registerPrompt(
+    'bmad-diagnose',
+    {
+      title: 'Project Diagnosis',
+      description: 'Diagnose project state: scan artifacts, check execution log, identify gaps and recommend next steps',
+    },
+    () => ({
+      messages: [
+        {
+          role: 'user' as const,
+          content: {
+            type: 'text' as const,
+            text: 'Diagnose this BMAD-S project. Call bmad_get_project_status to get the full dashboard and bmad_get_artifact_inventory to scan existing artifacts. Present a summary of: what artifacts exist, their coverage estimate, any orphan executions, failed workflows, and recommend what to do next.',
+          },
+        },
+      ],
+    }),
+  );
+
+  // --- bmad-sprint-status: Sprint dashboard ---
+  server.registerPrompt(
+    'bmad-sprint-status',
+    {
+      title: 'Sprint Status',
+      description: 'Show current sprint status with story progress and details',
+    },
+    () => ({
+      messages: [
+        {
+          role: 'user' as const,
+          content: {
+            type: 'text' as const,
+            text: 'Show me the current sprint status. Call bmad_get_sprint_status to get the sprint status file, and bmad_list_stories to see all stories. Present a dashboard showing: sprint progress, story statuses, and any blocked or failed stories.',
+          },
+        },
+      ],
+    }),
+  );
+
+  // --- bmad-elicitation: Advanced elicitation ---
+  server.registerPrompt(
+    'bmad-elicitation',
+    {
+      title: 'Advanced Elicitation',
+      description: 'Apply an advanced elicitation technique to the current context for deeper analysis',
+      argsSchema: {
+        technique: completable(
+          z.string().describe('Elicitation technique name (e.g., "Tree of Thoughts", "Pre-mortem Analysis")'),
+          (value) => {
+            const methods = listElicitationMethods(registry, reader, {});
+            return methods
+              .map((m) => m.method_name)
+              .filter((name) => name.toLowerCase().includes(value.toLowerCase()));
+          },
+        ),
+      },
+    },
+    ({ technique }) => ({
+      messages: [
+        {
+          role: 'user' as const,
+          content: {
+            type: 'text' as const,
+            text: `Apply the "${technique}" elicitation technique to the current context. First call bmad_list_elicitation_methods to find the technique details, then execute it following the described output pattern. Present the analysis results in a structured format.`,
           },
         },
       ],

@@ -46,6 +46,7 @@ function inferType(relativePath: string): ContentType {
   if (lower.endsWith('config.yaml') || lower.endsWith('module.yaml')) return 'config';
   // Steps can also be in steps-v, steps-c, steps-e directories
   if (/\/steps-[a-z]\//.test(lower)) return 'step';
+  if (lower.includes('/teams/')) return 'data';
   return 'other';
 }
 
@@ -123,9 +124,16 @@ export class ContentRegistry {
     const entry = this.entries.get(clean);
     if (entry) return entry;
 
-    // Try partial match
+    // Try suffix match (path must align on a / boundary)
     for (const [key, value] of this.entries) {
-      if (key.endsWith(path) || key.includes(path)) {
+      if (key.endsWith(path) && (key.length === path.length || key[key.length - path.length - 1] === '/')) {
+        return value;
+      }
+    }
+
+    // Fallback: substring match (less precise)
+    for (const [key, value] of this.entries) {
+      if (key.includes(path)) {
         return value;
       }
     }

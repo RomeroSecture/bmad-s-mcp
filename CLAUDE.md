@@ -30,10 +30,17 @@ bmad-mcp/
 │   ├── content/
 │   │   ├── registry.ts          # In-memory index of all bundled content (296 files)
 │   │   └── reader.ts            # File reader with path resolution
-│   ├── tools/                   # 17 MCP tools (list-*, get-*, search, help, docs)
+│   ├── project/                 # Project state access (ELP, VRG, sprint)
+│   │   ├── project-reader.ts    # Filesystem access to project dirs
+│   │   ├── execution-log.ts     # Parse/write ELP (execution-log.yaml)
+│   │   ├── artifact-scanner.ts  # VRG artifact inventory + mode recommendation
+│   │   └── sprint-reader.ts     # Sprint status + story listing
+│   ├── tools/                   # 26 MCP tools (content + project state)
 │   │   └── index.ts             # Tool registration orchestrator
 │   ├── resources/
-│   │   └── index.ts             # 5 MCP resources (bmad://*)
+│   │   └── index.ts             # 10 MCP resources (bmad://*)
+│   ├── prompts/
+│   │   └── index.ts             # 8 MCP prompts (bmad-*)
 │   └── utils/
 │       ├── content-transformer.ts # Rewrites _bmad/ file refs → MCP tool calls
 │       ├── csv-parser.ts        # Parses module-help.csv → WorkflowEntry[]
@@ -74,7 +81,8 @@ npm test               # Run vitest
 - **Content is bundled statically** in `content/` — 296 files (~262 BMAD + 34 docs). No network dependency at runtime.
 - **ContentRegistry** indexes all files at startup into an in-memory Map for fast lookup.
 - **Content Transformer** automatically rewrites `_bmad/` file references into MCP tool calls when serving content.
-- **17 granular tools** (not few large ones) — LLMs work better with small, focused tool schemas.
+- **26 granular tools** (17 content + 9 project state) — LLMs work better with small, focused tool schemas.
+- **Content vs Project separation** — ContentRegistry (static framework, 296 files) vs ProjectReader (runtime project state: ELP, VRG, sprint).
 - **Stateless server** — the LLM manages conversational state; BMAD manages document state via frontmatter.
 - **Config resolution order**: env vars > local project config (`_bmad/bmm/config.yaml`) > Zod defaults.
 
@@ -92,7 +100,9 @@ All content delivered by `get-*` tools passes through `transformContent()` which
 
 **Important:** Tools that parse content internally (`list-agents`, `list-workflows`, `bmad-help`, `search-content`) use `reader.readRaw()` to get untransformed content. Only user-facing content delivery uses `reader.readAbsolute(path, relativePath)` to trigger transformation.
 
-## Tools (17)
+## Tools (26)
+
+### Content Tools (17)
 
 | Tool | Purpose |
 |------|---------|
@@ -102,7 +112,7 @@ All content delivered by `get-*` tools passes through `transformContent()` which
 | `bmad_get_workflow` | Workflow content by code ("CP") or path |
 | `bmad_get_step` | Step file from a workflow's steps directory |
 | `bmad_get_template` | Template file with placeholders intact |
-| `bmad_get_data` | Data/CSV/reference files |
+| `bmad_get_data` | Data/CSV/reference files (includes teams) |
 | `bmad_get_task` | Task definitions (workflow.xml engine, help.md) |
 | `bmad_get_config` | Resolved BMAD configuration |
 | `bmad_help` | Routing guidance — next workflow recommendations |
@@ -114,15 +124,47 @@ All content delivered by `get-*` tools passes through `transformContent()` which
 | `bmad_list_docs` | List BMAD-S methodology documentation by category |
 | `bmad_get_doc` | Get a documentation file by path or topic |
 
-## Resources (5)
+### Project State Tools (9) — require `BMAD_PROJECT_ROOT`
+
+| Tool | Purpose | Read/Write |
+|------|---------|------------|
+| `bmad_get_execution_log` | Read ELP entries with filters (all/orphans/errors) | Read |
+| `bmad_write_execution_entry` | Write STARTED or closing ELP entry | **Write** |
+| `bmad_get_project_status` | Full project dashboard (artifacts, executions, sprint, inconsistencies) | Read |
+| `bmad_get_sprint_status` | Current sprint status file | Read |
+| `bmad_list_stories` | List stories with status/epic filtering | Read |
+| `bmad_get_story` | Get full story content by ID | Read |
+| `bmad_get_artifact_inventory` | VRG artifact scan with mode recommendation (VERIFY/REFINE/GENERATE) | Read |
+| `bmad_list_elicitation_methods` | 50 advanced elicitation techniques from methods.csv | Read |
+| `bmad_recover_execution` | Error recovery (FX): diagnose orphans/failures or resolve by ID | **Write** |
+
+## Resources (10)
 
 | URI | Content |
 |-----|---------|
 | `bmad://config` | Resolved configuration (YAML) |
 | `bmad://catalog/workflows` | Combined workflow catalog (JSON) |
 | `bmad://catalog/agents` | Agent roster with metadata (JSON) |
+| `bmad://catalog/elicitation-methods` | 50 advanced elicitation techniques (JSON) |
+| `bmad://catalog/teams` | Available teams from framework (JSON) |
 | `bmad://docs/overview` | BMAD-S Method overview from real documentation (Markdown) |
 | `bmad://core/workflow-engine` | workflow.xml execution engine (XML) |
+| `bmad://project/execution-log` | Current execution log (YAML) — requires project root |
+| `bmad://project/sprint-status` | Current sprint status (YAML) — requires project root |
+| `bmad://project/artifact-inventory` | VRG artifact inventory (JSON) — requires project root |
+
+## Prompts (8)
+
+| Prompt | Purpose |
+|--------|---------|
+| `bmad-create-prd` | Guided PRD creation workflow |
+| `bmad-create-architecture` | Guided architecture design |
+| `bmad-quick-spec` | Quick spec for simple tasks |
+| `bmad-brainstorm` | Brainstorming session facilitation |
+| `bmad-sprint-planning` | Sprint planning workflow |
+| `bmad-diagnose` | Project diagnosis — artifacts + executions + inconsistencies |
+| `bmad-sprint-status` | Sprint status dashboard — sprint + stories |
+| `bmad-elicitation` | Advanced elicitation technique selection and application |
 
 ## Environment Variables
 

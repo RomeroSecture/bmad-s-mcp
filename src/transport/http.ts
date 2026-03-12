@@ -40,7 +40,7 @@ export async function startHttp(port: number): Promise<void> {
   const { server } = createServer();
   const app = express();
 
-  app.use(express.json());
+  app.use(express.json({ limit: '5mb' }));
 
   // Health check (always public)
   app.get('/health', (_req, res) => {
@@ -49,20 +49,30 @@ export async function startHttp(port: number): Promise<void> {
 
   // MCP endpoint (protected by auth if BMAD_AUTH_TOKEN is set)
   app.post('/mcp', authMiddleware, async (req, res) => {
-    const transport = new StreamableHTTPServerTransport({
-      sessionIdGenerator: undefined,
-    });
+    try {
+      const transport = new StreamableHTTPServerTransport({
+        sessionIdGenerator: undefined,
+      });
 
-    res.on('close', () => {
-      transport.close();
-    });
+      res.on('close', () => {
+        transport.close();
+      });
 
-    await server.connect(transport);
-    await transport.handleRequest(req, res, req.body);
+      await server.connect(transport);
+      await transport.handleRequest(req, res, req.body);
+    } catch (err) {
+      logger.error(`MCP handler error: ${err}`);
+      if (!res.headersSent) {
+        res.status(500).json({ error: 'Internal server error' });
+      }
+    }
   });
 
   const authEnabled = !!process.env.BMAD_AUTH_TOKEN;
   app.listen(port, () => {
     logger.info(`HTTP server listening on port ${port} (auth: ${authEnabled ? 'enabled' : 'open'})`);
+  }).on('error', (err: NodeJS.ErrnoException) => {
+    logger.error(`Failed to start HTTP server: ${err.message}`);
+    process.exit(1);
   });
 }

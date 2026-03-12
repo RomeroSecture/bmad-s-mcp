@@ -22,8 +22,9 @@ export function getChecklist(
 ): string | null {
   let workflowDir = input.workflow_path.replace(/^_bmad\//, '');
 
-  // If path points to a file, get its directory
-  if (workflowDir.includes('workflow.') || workflowDir.includes('workflow-')) {
+  // If path points to a workflow file, get its directory
+  const lastSegment = workflowDir.split('/').pop() || '';
+  if (lastSegment.startsWith('workflow.') || lastSegment.startsWith('workflow-')) {
     // Try reading the workflow file to find validation reference
     const entry = registry.findByPath(workflowDir);
     if (entry) {

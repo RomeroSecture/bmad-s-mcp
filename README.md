@@ -21,8 +21,9 @@
   - [VS Code (Copilot)](#vs-code-copilot)
   - [Servidor Remoto (HTTP)](#servidor-remoto-http)
 - [Configuración](#configuración)
-- [Tools Disponibles (17)](#tools-disponibles-17)
-- [Resources Disponibles (5)](#resources-disponibles-5)
+- [Tools Disponibles (26)](#tools-disponibles-26)
+- [Resources Disponibles (10)](#resources-disponibles-10)
+- [Prompts Disponibles (8)](#prompts-disponibles-8)
 - [Agentes](#agentes)
 - [Workflows](#workflows)
 - [Documentación de la Metodología](#documentación-de-la-metodología)
@@ -159,7 +160,7 @@ Añadir a `~/.claude/settings.json` (global) o `.claude/settings.json` (por proy
 }
 ```
 
-Reinicia Claude Code. Los 17 tools de BMAD-S aparecerán automáticamente.
+Reinicia Claude Code. Los 26 tools de BMAD-S aparecerán automáticamente.
 
 ### Cursor
 
@@ -265,9 +266,9 @@ Esto significa que puedes establecer preferencias globales vía env vars y sobre
 
 ---
 
-## Tools Disponibles (17)
+## Tools Disponibles (26)
 
-### Tools de Descubrimiento
+### Tools de Descubrimiento (5)
 
 | Tool | Descripción | Ejemplo de Input |
 |------|-------------|-----------------|
@@ -277,7 +278,7 @@ Esto significa que puedes establecer preferencias globales vía env vars y sobre
 | `bmad_list_data` | Listar archivos de datos, protocolos y referencias | `{ "category": "all" }` |
 | `bmad_help` | Enrutamiento inteligente — recomienda el siguiente workflow | `{ "context": "PRD is done" }` |
 
-### Tools de Entrega de Contenido
+### Tools de Entrega de Contenido (8)
 
 | Tool | Descripción | Ejemplo de Input |
 |------|-------------|-----------------|
@@ -290,14 +291,14 @@ Esto significa que puedes establecer preferencias globales vía env vars y sobre
 | `bmad_get_protocol` | Cargar la definición de un protocolo | `{ "protocol_name": "ELP" }` |
 | `bmad_get_config` | Ver la configuración resuelta | `{}` |
 
-### Tools Avanzados
+### Tools Avanzados (2)
 
 | Tool | Descripción | Ejemplo de Input |
 |------|-------------|-----------------|
 | `bmad_get_checklist` | Obtener checklist de validación de un workflow | `{ "workflow_path": "bmm/workflows/4-implementation/code-review/workflow.yaml" }` |
 | `bmad_search_content` | Búsqueda full-text en todo el contenido BMAD-S | `{ "query": "sprint planning", "file_types": ["md", "yaml"] }` |
 
-### Tools de Documentación
+### Tools de Documentación (2)
 
 | Tool | Descripción | Ejemplo de Input |
 |------|-------------|-----------------|
@@ -306,9 +307,25 @@ Esto significa que puedes establecer preferencias globales vía env vars y sobre
 
 Las categorías disponibles son: `tutorials`, `how-to`, `explanation`, `reference`, `bmgd` (BMAD Game Development), y `all`.
 
+### Tools de Estado del Proyecto (9)
+
+Estos tools acceden al estado del proyecto en runtime (`_bmad-output/`, `docs/project/`). Requieren `BMAD_PROJECT_ROOT` o ejecutar el servidor desde un directorio con `_bmad/`. Si no están disponibles, devuelven un error descriptivo sin crashear.
+
+| Tool | Descripción | Lectura/Escritura |
+|------|-------------|-------------------|
+| `bmad_get_execution_log` | Leer entradas ELP con filtros (all/orphans/errors) | Lectura |
+| `bmad_write_execution_entry` | Escribir entrada ELP (STARTED o cierre) | **Escritura** |
+| `bmad_get_project_status` | Dashboard completo (artefactos, ejecuciones, sprint, inconsistencias) | Lectura |
+| `bmad_get_sprint_status` | Archivo de estado del sprint actual | Lectura |
+| `bmad_list_stories` | Listar stories con filtrado por status/epic | Lectura |
+| `bmad_get_story` | Obtener contenido completo de una story por ID | Lectura |
+| `bmad_get_artifact_inventory` | Escaneo VRG de artefactos con recomendación de modo (VERIFY/REFINE/GENERATE) | Lectura |
+| `bmad_list_elicitation_methods` | 50 técnicas avanzadas de elicitation desde methods.csv | Lectura |
+| `bmad_recover_execution` | Recuperación de errores (FX): diagnosticar o resolver ejecuciones huérfanas | **Escritura** |
+
 ---
 
-## Resources Disponibles (5)
+## Resources Disponibles (10)
 
 Los resources MCP son datos estáticos que la IA puede leer bajo demanda:
 
@@ -317,8 +334,30 @@ Los resources MCP son datos estáticos que la IA puede leer bajo demanda:
 | `bmad://config` | Configuración actual resuelta (YAML) |
 | `bmad://catalog/workflows` | Catálogo completo de workflows con metadata (JSON) |
 | `bmad://catalog/agents` | Roster completo de agentes con roles y capacidades (JSON) |
+| `bmad://catalog/elicitation-methods` | 50 técnicas avanzadas de elicitation (JSON) |
+| `bmad://catalog/teams` | Teams disponibles del framework (JSON) |
 | `bmad://docs/overview` | Overview del Método BMAD-S con documentación real (Markdown) |
 | `bmad://core/workflow-engine` | El motor `workflow.xml` para ejecutar workflows YAML (XML) |
+| `bmad://project/execution-log` | Log de ejecución actual (YAML) — requiere project root |
+| `bmad://project/sprint-status` | Estado del sprint actual (YAML) — requiere project root |
+| `bmad://project/artifact-inventory` | Inventario VRG de artefactos (JSON) — requiere project root |
+
+---
+
+## Prompts Disponibles (8)
+
+Los prompts MCP son instrucciones predefinidas que la IA puede usar como punto de partida:
+
+| Prompt | Descripción |
+|--------|-------------|
+| `bmad-create-prd` | Workflow guiado de creación de PRD |
+| `bmad-create-architecture` | Workflow guiado de diseño de arquitectura |
+| `bmad-quick-spec` | Quick spec para tareas simples |
+| `bmad-brainstorm` | Facilitación de sesión de brainstorming |
+| `bmad-sprint-planning` | Workflow de planificación de sprint |
+| `bmad-diagnose` | Diagnóstico de proyecto — artefactos + ejecuciones + inconsistencias |
+| `bmad-sprint-status` | Dashboard de sprint — estado + stories |
+| `bmad-elicitation` | Selección y aplicación de técnicas avanzadas de elicitation |
 
 ---
 
@@ -480,7 +519,7 @@ Tu IDE (Claude Code / Cursor / Windsurf / VS Code)
 │  ├── utility/ (templates)           │
 │  └── docs/    (metodología)         │
 │                                     │
-│  17 Tools + 5 Resources             │
+│  26 Tools + 10 Resources + 8 Prompts│
 └─────────────────────────────────────┘
 ```
 
@@ -501,7 +540,8 @@ El servidor MCP es un **servidor de contenido** — sirve el contenido de la met
 - **Contenido empaquetado** — Los 296 archivos BMAD-S (contenido + documentación) están incluidos en el servidor. Sin llamadas de red para obtener contenido en tiempo de ejecución.
 - **Indexado al arrancar** — Cada archivo se categoriza e indexa en un registro en memoria para búsquedas en sub-milisegundos.
 - **Sin estado** — El servidor no tiene estado de sesión. La IA gestiona el contexto conversacional; BMAD gestiona el estado de documentos vía archivos de salida.
-- **Tools granulares** — 17 tools pequeños y enfocados en vez de pocos grandes. Los LLMs funcionan mejor con schemas de tools específicos.
+- **Tools granulares** — 26 tools pequeños y enfocados (17 contenido + 9 estado del proyecto) en vez de pocos grandes. Los LLMs funcionan mejor con schemas de tools específicos.
+- **Separación Content vs Project** — ContentRegistry (framework estático, 296 archivos) vs ProjectReader (estado del proyecto en runtime: ELP, VRG, sprint). Graceful degradation cuando el project root no está disponible.
 
 ---
 
@@ -791,9 +831,16 @@ bmad-mcp/
 │   ├── content/
 │   │   ├── registry.ts          # Índice de archivos en memoria (construido al arrancar)
 │   │   └── reader.ts            # Lector de archivos con resolución de rutas
-│   ├── tools/                   # 17 implementaciones de tools MCP
+│   ├── project/                 # Acceso al estado del proyecto (ELP, VRG, sprint)
+│   │   ├── project-reader.ts    # Acceso filesystem a directorios del proyecto
+│   │   ├── execution-log.ts     # Parse/write ELP (execution-log.yaml)
+│   │   ├── artifact-scanner.ts  # Inventario VRG + recomendación de modo
+│   │   └── sprint-reader.ts     # Estado del sprint + listado de stories
+│   ├── tools/                   # 26 implementaciones de tools MCP
 │   │   └── index.ts             # Orquestador de registro
-│   ├── resources/               # 5 definiciones de resources MCP
+│   ├── resources/               # 10 definiciones de resources MCP
+│   │   └── index.ts
+│   ├── prompts/                 # 8 prompts MCP predefinidos
 │   │   └── index.ts
 │   └── utils/
 │       ├── content-transformer.ts # Reescribe refs _bmad/ → llamadas MCP

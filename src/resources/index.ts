@@ -1,5 +1,6 @@
 import { McpServer, ResourceTemplate } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { ContentRegistry } from '../content/registry.js';
+import type { ProjectReader } from '../project/project-reader.js';
 import { ContentReader } from '../content/reader.js';
 import { listWorkflows } from '../tools/list-workflows.js';
 import { listAgents } from '../tools/list-agents.js';
@@ -7,8 +8,9 @@ import { getAgent } from '../tools/get-agent.js';
 import { getConfig } from '../tools/get-config.js';
 import { getDoc } from '../tools/get-doc.js';
 import { getWorkflow } from '../tools/get-workflow.js';
+import { listElicitationMethods } from '../tools/list-elicitation-methods.js';
 
-export function registerResources(server: McpServer, registry: ContentRegistry): void {
+export function registerResources(server: McpServer, registry: ContentRegistry, _projectReader?: ProjectReader): void {
   const reader = new ContentReader(registry);
 
   // ===== Static Resources =====
@@ -120,6 +122,46 @@ export function registerResources(server: McpServer, registry: ContentRegistry):
           uri: 'bmad://core/workflow-engine',
           mimeType: 'application/xml',
           text: content || 'workflow.xml not found',
+        }],
+      };
+    },
+  );
+
+  // bmad://catalog/elicitation-methods — 50 elicitation techniques
+  server.registerResource(
+    'elicitation-methods',
+    'bmad://catalog/elicitation-methods',
+    { title: 'Elicitation Methods', description: 'Catalog of 50 advanced elicitation techniques for deep-dive analysis' },
+    async () => {
+      const methods = listElicitationMethods(registry, reader, {});
+      return {
+        contents: [{
+          uri: 'bmad://catalog/elicitation-methods',
+          mimeType: 'application/json',
+          text: JSON.stringify(methods, null, 2),
+        }],
+      };
+    },
+  );
+
+  // bmad://catalog/teams — Team configurations
+  server.registerResource(
+    'teams-catalog',
+    'bmad://catalog/teams',
+    { title: 'Teams Catalog', description: 'Available team configurations from the BMAD framework' },
+    async () => {
+      const dataEntries = registry.getByType('data');
+      const teamEntries = dataEntries.filter((e) => e.relativePath.includes('/teams/'));
+      const teams = teamEntries.map((e) => ({
+        path: e.relativePath,
+        name: e.relativePath.split('/').pop()?.replace(/\.[^.]+$/, '') || e.relativePath,
+        content: reader.readAbsolute(e.absolutePath, e.relativePath),
+      }));
+      return {
+        contents: [{
+          uri: 'bmad://catalog/teams',
+          mimeType: 'application/json',
+          text: JSON.stringify(teams, null, 2),
         }],
       };
     },

@@ -3,7 +3,8 @@ import { startStdio } from './transport/stdio.js';
 import { startHttp } from './transport/http.js';
 
 const transport = process.env.BMAD_TRANSPORT || 'stdio';
-const port = parseInt(process.env.BMAD_HTTP_PORT || '3000', 10);
+const rawPort = parseInt(process.env.BMAD_HTTP_PORT || '3000', 10);
+const port = Number.isNaN(rawPort) ? 3000 : rawPort;
 
 async function main(): Promise<void> {
   if (transport === 'http') {

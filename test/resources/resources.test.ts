@@ -38,8 +38,8 @@ describe('MCP Resources', () => {
     registerResources(mockServer as any, mockRegistry as any);
   });
 
-  it('registers exactly 8 resources (5 static + 3 templates)', () => {
-    expect(resourceCalls).toHaveLength(8);
+  it('registers exactly 10 resources (7 static + 3 templates)', () => {
+    expect(resourceCalls).toHaveLength(10);
   });
 
   describe('Static Resources', () => {
@@ -71,6 +71,18 @@ describe('MCP Resources', () => {
       const res = resourceCalls.find((r) => r.name === 'workflow-engine');
       expect(res).toBeDefined();
       expect(res!.uri).toBe('bmad://core/workflow-engine');
+    });
+
+    it('registers elicitation-methods resource', () => {
+      const res = resourceCalls.find((r) => r.name === 'elicitation-methods');
+      expect(res).toBeDefined();
+      expect(res!.uri).toBe('bmad://catalog/elicitation-methods');
+    });
+
+    it('registers teams-catalog resource', () => {
+      const res = resourceCalls.find((r) => r.name === 'teams-catalog');
+      expect(res).toBeDefined();
+      expect(res!.uri).toBe('bmad://catalog/teams');
     });
   });
 

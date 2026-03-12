@@ -27,6 +27,7 @@ export function getProtocol(
       const fileName = p.relativePath.split('/').pop()?.replace(/\.(md|xml|yaml)$/, '') || '';
       const initials = fileName
         .split('-')
+        .filter(Boolean)
         .map((w) => w[0])
         .join('')
         .toLowerCase();

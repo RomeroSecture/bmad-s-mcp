@@ -41,8 +41,8 @@ describe('MCP Prompts', () => {
     registerPrompts(mockServer as any, mockRegistry as any);
   });
 
-  it('registers exactly 5 prompts', () => {
-    expect(promptCalls).toHaveLength(5);
+  it('registers exactly 8 prompts', () => {
+    expect(promptCalls).toHaveLength(8);
   });
 
   it('registers bmad-start prompt', () => {
@@ -77,6 +77,25 @@ describe('MCP Prompts', () => {
     expect(prompt).toBeDefined();
     expect(prompt!.description).toContain('methodology');
     expect(prompt!.args).toHaveProperty('topic');
+  });
+
+  it('registers bmad-diagnose prompt', () => {
+    const prompt = promptCalls.find((p) => p.name === 'bmad-diagnose');
+    expect(prompt).toBeDefined();
+    expect(prompt!.description).toContain('Diagnose');
+  });
+
+  it('registers bmad-sprint-status prompt', () => {
+    const prompt = promptCalls.find((p) => p.name === 'bmad-sprint-status');
+    expect(prompt).toBeDefined();
+    expect(prompt!.description).toContain('sprint');
+  });
+
+  it('registers bmad-elicitation prompt', () => {
+    const prompt = promptCalls.find((p) => p.name === 'bmad-elicitation');
+    expect(prompt).toBeDefined();
+    expect(prompt!.description).toContain('elicitation');
+    expect(prompt!.args).toHaveProperty('technique');
   });
 
   describe('prompt handlers', () => {
@@ -122,6 +141,27 @@ describe('MCP Prompts', () => {
       const result = prompt.handler({ topic: 'vrg' }) as any;
       expect(result.messages[0].content.text).toContain('vrg');
       expect(result.messages[0].content.text).toContain('bmad_get_doc');
+    });
+
+    it('bmad-diagnose handler requests project status and inventory', () => {
+      const prompt = promptCalls.find((p) => p.name === 'bmad-diagnose')!;
+      const result = prompt.handler({}) as any;
+      expect(result.messages[0].content.text).toContain('bmad_get_project_status');
+      expect(result.messages[0].content.text).toContain('bmad_get_artifact_inventory');
+    });
+
+    it('bmad-sprint-status handler requests sprint data', () => {
+      const prompt = promptCalls.find((p) => p.name === 'bmad-sprint-status')!;
+      const result = prompt.handler({}) as any;
+      expect(result.messages[0].content.text).toContain('bmad_get_sprint_status');
+      expect(result.messages[0].content.text).toContain('bmad_list_stories');
+    });
+
+    it('bmad-elicitation handler includes technique name', () => {
+      const prompt = promptCalls.find((p) => p.name === 'bmad-elicitation')!;
+      const result = prompt.handler({ technique: 'Tree of Thoughts' }) as any;
+      expect(result.messages[0].content.text).toContain('Tree of Thoughts');
+      expect(result.messages[0].content.text).toContain('bmad_list_elicitation_methods');
     });
   });
 });

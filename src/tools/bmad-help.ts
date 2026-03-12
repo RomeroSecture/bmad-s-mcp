@@ -51,9 +51,6 @@ export function bmadHelp(
   lines.push(`\nProject: **${config.project_name}** | Language: ${config.communication_language}`);
   lines.push(`\nUse \`bmad_get_workflow\` with the workflow code to load any workflow.\n`);
 
-  // Load the help.md task for routing rules context
-  const helpTask = reader.readFromContent('core', 'tasks', 'help.md');
-
   for (const [phase, workflows] of sortedPhases) {
     lines.push(`\n## Phase: ${phase}`);
 
